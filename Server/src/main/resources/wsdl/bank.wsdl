@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<wsdl:definitions name="Bank"
+                  targetNamespace="http://bsr.com/services/bank"
+                  xmlns:tns="http://bsr.com/services/bank" xmlns:types="http://bsr.com/services/bank"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+
+    <wsdl:types>
+
+    </wsdl:types>
+
+</wsdl:definitions>
