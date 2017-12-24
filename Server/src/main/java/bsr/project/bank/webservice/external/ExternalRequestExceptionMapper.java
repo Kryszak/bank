@@ -25,14 +25,14 @@ public class ExternalRequestExceptionMapper {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(InvalidAmountException.class)
     public ValidationError handleInvalidTransferAmount(InvalidAmountException e) {
-        log.error("{}", e);
+        log.error("", e);
         return ValidationError.builder().errorField(AMOUNT).error("Błędna kwota przelewu.").build();
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(InvalidTitleException.class)
     public ValidationError handleInvalidTransferTitle(InvalidTitleException e) {
-        log.error("{}", e);
+        log.error("", e);
         return ValidationError
                 .builder()
                 .errorField(TITLE)
@@ -43,27 +43,27 @@ public class ExternalRequestExceptionMapper {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(InvalidSenderNameException.class)
     public ValidationError handleInvalidSenderName(InvalidSenderNameException e) {
-        log.error("{}", e);
+        log.error("", e);
         return ValidationError.builder().errorField(NAME).error("Nie podano zlecającego przelew").build();
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(InvalidSourceAccountException.class)
     public ValidationError handleInvalidSourceAccount(InvalidSourceAccountException e) {
-        log.error("{}", e);
+        log.error("", e);
         return ValidationError.builder().errorField(SOURCE_ACCOUNT).error(e.getDescription()).build();
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(InvalidCredentialsException.class)
     public void handleInvalidCredentials(InvalidCredentialsException e) {
-        log.error("{}", e);
+        log.error("", e);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ValidationError handleUnexpectedError(Exception e) {
-        log.error("{}", e);
+        log.error("", e);
         return ValidationError.builder().errorField("unknown").error("Wystąpił nieoczekiwany błąd.").build();
     }
 }

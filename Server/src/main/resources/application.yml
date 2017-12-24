@@ -1,6 +1,7 @@
 app:
   config:
     externalBankListFile: /home/kryszak/external.csv
+    bankCode: "00117298"
 spring:
   h2:
     console:
