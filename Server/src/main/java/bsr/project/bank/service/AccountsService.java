@@ -1,16 +1,17 @@
 package bsr.project.bank.service;
 
-import bsr.project.bank.model.User;
-import bsr.project.bank.service.data.UserRepository;
+import bsr.project.bank.service.data.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AccountsService {
 
+    @Autowired
+    private AccountRepository accountRepository;
+
     public boolean accountExists(String accountNumber) {
-        // TODO
-        return true;
+        return accountRepository.exists(accountNumber);
     }
 
 
