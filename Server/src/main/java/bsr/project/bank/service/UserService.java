@@ -18,4 +18,9 @@ public class UserService {
     public boolean userExists(User user) {
         return userRepository.exists(user.getId());
     }
+
+    public boolean authenticate(User user) {
+        // TODO
+        return true;
+    }
 }

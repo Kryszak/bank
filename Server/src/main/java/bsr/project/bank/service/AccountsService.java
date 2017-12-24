@@ -44,6 +44,12 @@ public class AccountsService {
                 .build());
     }
 
+    public void updateAccount(Account account) {
+        accountRepository.save(account);
+    }
 
+    public Account getAccount(String accountNumber) {
+        return accountRepository.findByAccountNumber(accountNumber);
+    }
 }
 

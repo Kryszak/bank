@@ -1,6 +1,7 @@
 package bsr.project.bank.webservice.external;
 
 import bsr.project.bank.model.ExternalTransfer;
+import bsr.project.bank.service.AccountOperationService;
 import bsr.project.bank.service.ExternalAuthorizationService;
 import bsr.project.bank.webservice.external.validation.*;
 import lombok.extern.slf4j.Slf4j;
@@ -18,12 +19,15 @@ public class ExternalRequestHandler {
     @Autowired
     private ExternalAuthorizationService authorizationService;
 
+    @Autowired
+    private AccountOperationService accountOperationService;
+
     public void handleRequest(String accountNumber, ExternalTransfer transfer, String authorizationHeader)
             throws AccountDoesNotExistsException, InvalidAmountException,
             InvalidTitleException, InvalidSenderNameException, InvalidSourceAccountException, InvalidCredentialsException {
         checkAuthentication(authorizationHeader);
         validateRequest(accountNumber, transfer);
-        // TODO
+        accountOperationService.transfer(transfer, accountNumber);
     }
 
     private void checkAuthentication(String authorizationHeader) throws InvalidCredentialsException {

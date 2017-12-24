@@ -22,4 +22,7 @@ public class Account {
     @ManyToOne(optional = false)
     @JoinColumn(name = "id", referencedColumnName = "id")
     private User user;
+
+    @Builder.Default
+    private long balance = 0;
 }

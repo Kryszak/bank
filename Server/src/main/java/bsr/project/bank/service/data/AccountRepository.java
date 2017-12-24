@@ -8,4 +8,6 @@ import java.util.List;
 public interface AccountRepository extends CrudRepository<Account, String> {
 
     List<Account> findAll();
+
+    Account findByAccountNumber(String accountNumber);
 }

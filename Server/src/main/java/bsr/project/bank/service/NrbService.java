@@ -11,11 +11,11 @@ import java.util.Random;
 @Service
 public class NrbService {
 
-    private String DIGITS = "0123456789";
+    private static final String DIGITS = "0123456789";
+
+    private static final String countryCode = "2521";
 
     private Random rng = new SecureRandom();
-
-    private String countryCode = "2521";
 
     @Value("${app.config.bankCode}")
     private String bankCode;
