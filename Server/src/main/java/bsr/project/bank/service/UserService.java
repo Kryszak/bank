@@ -6,13 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AccountsService {
+public class UserService {
 
-    public boolean accountExists(String accountNumber) {
-        // TODO
-        return true;
+    @Autowired
+    private UserRepository userRepository;
+
+    public void createUser(User user) {
+        userRepository.save(user);
     }
-
-
 }
-
