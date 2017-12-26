@@ -27,7 +27,7 @@ public class AccountsService {
         return accountRepository.exists(accountNumber);
     }
 
-    public void createAccount(User user) {
+    public Account createAccount(User user) {
         if (!userService.userExists(user)) {
             log.warn("User does not exists, skipping...");
         }
@@ -37,11 +37,14 @@ public class AccountsService {
             nrb = nrbService.generateNrb();
         }
         log.info("Creating account for user {} with NRB: {}", user, nrb);
-        accountRepository.save(Account
+        Account account = Account
                 .builder()
                 .user(user)
                 .accountNumber(nrb)
-                .build());
+                .build();
+        accountRepository.save(account);
+
+        return account;
     }
 
     public void updateAccount(Account account) {
