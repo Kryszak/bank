@@ -39,6 +39,7 @@ public class ExternalBankClient {
         log.info("Requesting URL: {}", url);
 
         try {
+            // TODO przepchanie usera i passów do basic auth
             ResponseEntity<Void> response = restTemplate.postForEntity(
                     url,
                     new HttpEntity<>(transfer, createHeaders("TODO", "TODO")),
