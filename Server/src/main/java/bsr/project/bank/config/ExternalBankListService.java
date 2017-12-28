@@ -18,7 +18,16 @@ public class ExternalBankListService {
     private String filePath;
 
     @LogMethodCall
-    public List<ExternalBankAddress> getAvailableBanks() throws IOException {
+    public String getBankUrl(String bankCode) throws IOException {
+        return getAvailableBanks()
+                .stream()
+                .filter(address -> address.getBankIdNumber().equals(bankCode))
+                .map(ExternalBankAddress::getBankUrl)
+                .findFirst()
+                .orElse("");
+    }
+
+    private List<ExternalBankAddress> getAvailableBanks() throws IOException {
         CSVReader csvReader = new CSVReader(new FileReader(filePath));
         List<String[]> lines = csvReader.readAll();
         return lines

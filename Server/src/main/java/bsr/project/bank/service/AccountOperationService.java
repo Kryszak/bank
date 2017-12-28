@@ -3,24 +3,47 @@ package bsr.project.bank.service;
 import bsr.project.bank.model.*;
 import bsr.project.bank.service.data.AccountHistoryRepository;
 import bsr.project.bank.utility.logging.LogMethodCall;
+import bsr.project.bank.webservice.external.ExternalBankClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
 public class AccountOperationService {
 
-    public static final String REMITTANCE = "WPŁATA";
-    public static final String WITDRAWAL = "WYPŁATA";
+    private static final String REMITTANCE = "WPŁATA";
+
+    private static final String WITDRAWAL = "WYPŁATA";
+
     @Autowired
     private AccountHistoryRepository accountHistoryRepository;
 
     @Autowired
     private AccountsService accountsService;
 
+    @Autowired
+    private ExternalBankClient externalBankClient;
+
     public List<AccountOperation> getAccountHistory(Account account) {
         return accountHistoryRepository.findByAccount(account);
+    }
+
+    @LogMethodCall
+    public void externalTransfer(ExternalTransfer transfer, String destinationAccount) throws IOException {
+        Account sourceAccount = accountsService.getAccount(transfer.getSource_account());
+        externalBankClient.requestExternalTransfer(transfer, destinationAccount);
+        Transfer internal = Transfer
+                .builder()
+                .amount(transfer.getAmount())
+                .destinationAccount(destinationAccount)
+                .sourceAccount(transfer.getSource_account())
+                .title(transfer.getTitle())
+                .build();
+        long sourceAccountBalance = getAndUpdateSourceAccountBalance(internal, sourceAccount);
+        saveAccountOperationEvent(
+                createLossEvent(internal, sourceAccount, (int) sourceAccountBalance));
     }
 
     @LogMethodCall
@@ -118,10 +141,6 @@ public class AccountOperationService {
         sourceAccount.setBalance(sourceAccountBalance);
         accountsService.updateAccount(sourceAccount);
         return sourceAccountBalance;
-    }
-
-    public void externalTransfer(Transfer transfer) {
-        // TODO
     }
 
     private void saveAccountOperationEvent(AccountOperation accountOperation) {

@@ -1,13 +1,16 @@
 package bsr.project.bank.service;
 
 import bsr.project.bank.model.*;
+import bsr.project.bank.webservice.external.ExternalBankClient;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.IOException;
 import java.util.List;
 
 @SpringBootTest
@@ -22,6 +25,9 @@ public class AccountOperationServiceTest {
 
     @Autowired
     private AccountOperationService accountOperationService;
+
+    @MockBean
+    private ExternalBankClient externalBankClient;
 
     private static final int TRANSFER_AMOUNT = 100;
 
@@ -127,5 +133,30 @@ public class AccountOperationServiceTest {
         destination = accountsService.getAccount(destination.getAccountNumber());
         Assertions.assertThat(accountOperationService.getAccountHistory(destination).size() - historySize).isEqualTo(1);
         Assertions.assertThat(destination.getBalance()).isEqualTo(balance - TRANSFER_AMOUNT);
+    }
+
+    @Test
+    public void shouldHandleExternalTransfer() throws IOException {
+        // given
+        User user = User.builder().name("test").password("test").build();
+        userService.createUser(user);
+        Account source = accountsService.createAccount(user);
+        int historySize = accountOperationService.getAccountHistory(source).size();
+        int balance = (int) source.getBalance();
+        ExternalTransfer transfer = ExternalTransfer
+                .builder()
+                .title("test title")
+                .source_account(source.getAccountNumber())
+                .name("test name")
+                .amount(TRANSFER_AMOUNT)
+                .build();
+
+        // when
+        accountOperationService.externalTransfer(transfer, source.getAccountNumber());
+
+        // then
+        source = accountsService.getAccount(source.getAccountNumber());
+        Assertions.assertThat(accountOperationService.getAccountHistory(source).size() - historySize).isEqualTo(1);
+        Assertions.assertThat(source.getBalance()).isEqualTo(balance - TRANSFER_AMOUNT);
     }
 }

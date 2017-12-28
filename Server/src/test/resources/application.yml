@@ -1,6 +1,7 @@
 app:
   config:
     externalBankListFile: /home/kryszak/external.csv
+    externalBankUri: "/accounts/{accountNumber}/history"
     bankCode: "00117298"
 spring:
   datasource:
