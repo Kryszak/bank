@@ -82,4 +82,31 @@ public class AccountOperationServiceTest {
         Assertions.assertThat(accountOperationService.getAccountHistory(destination).size() - historySize).isEqualTo(1);
         Assertions.assertThat(destination.getBalance()).isEqualTo(balance + TRANSFER_AMOUNT);
     }
+
+    @Test
+    public void shouldHandleRemittance() {
+        // given
+        User user = User.builder().name("test").password("test").build();
+        userService.createUser(user);
+        Account destination = accountsService.createAccount(user);
+        int historySize = accountOperationService.getAccountHistory(destination).size();
+        int balance = (int) destination.getBalance();
+        Payment payment = Payment
+                .builder()
+                .amount(TRANSFER_AMOUNT)
+                .destinationAccount(destination.getAccountNumber())
+                .build();
+
+        // when
+        accountOperationService.remittance(payment);
+
+        // then
+        destination = accountsService.getAccount(destination.getAccountNumber());
+        Assertions.assertThat(accountOperationService.getAccountHistory(destination).size() - historySize).isEqualTo(1);
+        Assertions.assertThat(destination.getBalance()).isEqualTo(balance + TRANSFER_AMOUNT);
+    }
+
+    @Test
+    public void shouldHandleWithdrawal() {
+    }
 }

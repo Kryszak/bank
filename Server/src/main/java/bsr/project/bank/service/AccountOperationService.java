@@ -1,9 +1,6 @@
 package bsr.project.bank.service;
 
-import bsr.project.bank.model.Account;
-import bsr.project.bank.model.AccountOperation;
-import bsr.project.bank.model.ExternalTransfer;
-import bsr.project.bank.model.Transfer;
+import bsr.project.bank.model.*;
 import bsr.project.bank.service.data.AccountHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +10,7 @@ import java.util.List;
 @Service
 public class AccountOperationService {
 
+    public static final String REMITTANCE = "WPŁATA";
     @Autowired
     private AccountHistoryRepository accountHistoryRepository;
 
@@ -48,6 +46,20 @@ public class AccountOperationService {
                 createSentTransferEvent(transfer, sourceAccount, (int) sourceAccountBalance));
         saveAccountOperationEvent(
                 createReceivedTransferEvent(transfer, destinationAccount, (int) destinationAccountBalance));
+    }
+
+    public void remittance(Payment payment) {
+        Account destination = accountsService.getAccount(payment.getDestinationAccount());
+        Transfer transfer = Transfer
+                .builder()
+                .amount(payment.getAmount())
+                .destinationAccount(destination.getAccountNumber())
+                .sourceAccount(destination.getAccountNumber())
+                .title(REMITTANCE)
+                .build();
+        long destinationAccountBalance = getAndUpdateDestinationAccountBalance(transfer, destination);
+        saveAccountOperationEvent(
+                createReceivedTransferEvent(transfer, destination, (int) destinationAccountBalance));
     }
 
     private AccountOperation createSentTransferEvent(Transfer transfer, Account account, int accountBalance) {
@@ -89,10 +101,6 @@ public class AccountOperationService {
     }
 
     public void externalTransfer(Transfer transfer) {
-        // TODO
-    }
-
-    public void remittance() {
         // TODO
     }
 
