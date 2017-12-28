@@ -11,6 +11,7 @@ import java.util.List;
 public class AccountOperationService {
 
     public static final String REMITTANCE = "WPŁATA";
+    public static final String WITDRAWAL = "WYPŁATA";
     @Autowired
     private AccountHistoryRepository accountHistoryRepository;
 
@@ -32,7 +33,7 @@ public class AccountOperationService {
                 .build();
         long destinationAccountBalance = getAndUpdateDestinationAccountBalance(internal, destination);
         saveAccountOperationEvent(
-                createReceivedTransferEvent(internal, destination, (int) destinationAccountBalance));
+                createIncomeEvent(internal, destination, (int) destinationAccountBalance));
     }
 
     public void internalTransfer(Transfer transfer) {
@@ -43,9 +44,9 @@ public class AccountOperationService {
         long destinationAccountBalance = getAndUpdateDestinationAccountBalance(transfer, destinationAccount);
 
         saveAccountOperationEvent(
-                createSentTransferEvent(transfer, sourceAccount, (int) sourceAccountBalance));
+                createLossEvent(transfer, sourceAccount, (int) sourceAccountBalance));
         saveAccountOperationEvent(
-                createReceivedTransferEvent(transfer, destinationAccount, (int) destinationAccountBalance));
+                createIncomeEvent(transfer, destinationAccount, (int) destinationAccountBalance));
     }
 
     public void remittance(Payment payment) {
@@ -59,10 +60,24 @@ public class AccountOperationService {
                 .build();
         long destinationAccountBalance = getAndUpdateDestinationAccountBalance(transfer, destination);
         saveAccountOperationEvent(
-                createReceivedTransferEvent(transfer, destination, (int) destinationAccountBalance));
+                createIncomeEvent(transfer, destination, (int) destinationAccountBalance));
     }
 
-    private AccountOperation createSentTransferEvent(Transfer transfer, Account account, int accountBalance) {
+    public void withdrawal(Payment payment) {
+        Account destination = accountsService.getAccount(payment.getDestinationAccount());
+        Transfer transfer = Transfer
+                .builder()
+                .amount(payment.getAmount())
+                .destinationAccount(destination.getAccountNumber())
+                .sourceAccount(destination.getAccountNumber())
+                .title(WITDRAWAL)
+                .build();
+        long accountBalance = getAndUpdateSourceAccountBalance(transfer, destination);
+        saveAccountOperationEvent(
+                createLossEvent(transfer, destination, (int) accountBalance));
+    }
+
+    private AccountOperation createLossEvent(Transfer transfer, Account account, int accountBalance) {
         return AccountOperation
                 .builder()
                 .sourceAccountNumber(transfer.getSourceAccount())
@@ -73,7 +88,7 @@ public class AccountOperationService {
                 .build();
     }
 
-    private AccountOperation createReceivedTransferEvent(Transfer transfer, Account account, int accountBalance) {
+    private AccountOperation createIncomeEvent(Transfer transfer, Account account, int accountBalance) {
         return AccountOperation
                 .builder()
                 .sourceAccountNumber(transfer.getSourceAccount())
@@ -101,10 +116,6 @@ public class AccountOperationService {
     }
 
     public void externalTransfer(Transfer transfer) {
-        // TODO
-    }
-
-    public void withdrawal() {
         // TODO
     }
 
