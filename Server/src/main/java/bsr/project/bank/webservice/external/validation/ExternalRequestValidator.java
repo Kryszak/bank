@@ -2,6 +2,7 @@ package bsr.project.bank.webservice.external.validation;
 
 import bsr.project.bank.model.ExternalTransfer;
 import bsr.project.bank.service.AccountsService;
+import bsr.project.bank.utility.logging.LogMethodCall;
 import org.iban4j.IbanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,12 +13,14 @@ public class ExternalRequestValidator {
     @Autowired
     private AccountsService accountsService;
 
+    @LogMethodCall
     public void validate(String accountNumber) throws AccountDoesNotExistsException {
         if (!accountsService.accountExists(accountNumber)) {
             throw new AccountDoesNotExistsException();
         }
     }
 
+    @LogMethodCall
     public void validate(ExternalTransfer transfer)
             throws InvalidAmountException, InvalidTitleException, InvalidSenderNameException, InvalidSourceAccountException {
         validateAmount(transfer.getAmount());

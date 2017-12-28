@@ -1,5 +1,6 @@
 package bsr.project.bank.service;
 
+import bsr.project.bank.utility.logging.LogMethodCall;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class NrbService {
         return DIGITS.charAt(rng.nextInt(DIGITS.length()));
     }
 
+    @LogMethodCall
     public String generateNrb() {
         StringBuilder sb = new StringBuilder();
         int length = 16;

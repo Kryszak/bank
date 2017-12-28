@@ -2,6 +2,7 @@ package bsr.project.bank.service;
 
 import bsr.project.bank.model.*;
 import bsr.project.bank.service.data.AccountHistoryRepository;
+import bsr.project.bank.utility.logging.LogMethodCall;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ public class AccountOperationService {
         return accountHistoryRepository.findByAccount(account);
     }
 
+    @LogMethodCall
     public void transfer(ExternalTransfer transfer, String destinationAccount) {
         Account destination = accountsService.getAccount(destinationAccount);
         Transfer internal = Transfer
@@ -36,6 +38,7 @@ public class AccountOperationService {
                 createIncomeEvent(internal, destination, (int) destinationAccountBalance));
     }
 
+    @LogMethodCall
     public void internalTransfer(Transfer transfer) {
         Account sourceAccount = accountsService.getAccount(transfer.getSourceAccount());
         long sourceAccountBalance = getAndUpdateSourceAccountBalance(transfer, sourceAccount);
@@ -49,6 +52,7 @@ public class AccountOperationService {
                 createIncomeEvent(transfer, destinationAccount, (int) destinationAccountBalance));
     }
 
+    @LogMethodCall
     public void remittance(Payment payment) {
         Account destination = accountsService.getAccount(payment.getDestinationAccount());
         Transfer transfer = Transfer
@@ -63,6 +67,7 @@ public class AccountOperationService {
                 createIncomeEvent(transfer, destination, (int) destinationAccountBalance));
     }
 
+    @LogMethodCall
     public void withdrawal(Payment payment) {
         Account destination = accountsService.getAccount(payment.getDestinationAccount());
         Transfer transfer = Transfer

@@ -3,6 +3,7 @@ package bsr.project.bank.service;
 import bsr.project.bank.model.Account;
 import bsr.project.bank.model.User;
 import bsr.project.bank.service.data.AccountRepository;
+import bsr.project.bank.utility.logging.LogMethodCall;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class AccountsService {
         return accountRepository.exists(accountNumber);
     }
 
+    @LogMethodCall
     public Account createAccount(User user) {
         if (!userService.userExists(user)) {
             log.warn("User does not exists, skipping...");
@@ -47,10 +49,12 @@ public class AccountsService {
         return account;
     }
 
+    @LogMethodCall
     public void updateAccount(Account account) {
         accountRepository.save(account);
     }
 
+    @LogMethodCall
     public Account getAccount(String accountNumber) {
         return accountRepository.findByAccountNumber(accountNumber);
     }
