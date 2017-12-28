@@ -24,7 +24,17 @@ public class AccountOperationService {
     }
 
     public void transfer(ExternalTransfer transfer, String destinationAccount) {
-        // TODO
+        Account destination = accountsService.getAccount(destinationAccount);
+        Transfer internal = Transfer
+                .builder()
+                .amount(transfer.getAmount())
+                .destinationAccount(destinationAccount)
+                .sourceAccount(transfer.getSource_account())
+                .title(transfer.getTitle())
+                .build();
+        long destinationAccountBalance = getAndUpdateDestinationAccountBalance(internal, destination);
+        saveAccountOperationEvent(
+                createReceivedTransferEvent(internal, destination, (int) destinationAccountBalance));
     }
 
     public void internalTransfer(Transfer transfer) {

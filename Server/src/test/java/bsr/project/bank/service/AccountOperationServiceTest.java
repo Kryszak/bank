@@ -1,9 +1,6 @@
 package bsr.project.bank.service;
 
-import bsr.project.bank.model.Account;
-import bsr.project.bank.model.AccountOperation;
-import bsr.project.bank.model.Transfer;
-import bsr.project.bank.model.User;
+import bsr.project.bank.model.*;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,5 +56,30 @@ public class AccountOperationServiceTest {
         destination = accountsService.getAccount(destination.getAccountNumber());
         Assertions.assertThat(source.getBalance()).isEqualTo(0);
         Assertions.assertThat(destination.getBalance()).isEqualTo(1100);
+    }
+
+    @Test
+    public void shouldHandleIncomingExternalTransfer() {
+        // given
+        User user = User.builder().name("test").password("test").build();
+        userService.createUser(user);
+        Account destination = accountsService.createAccount(user);
+        int historySize = accountOperationService.getAccountHistory(destination).size();
+        int balance = (int) destination.getBalance();
+        ExternalTransfer transfer = ExternalTransfer
+                .builder()
+                .amount(TRANSFER_AMOUNT)
+                .name("test name")
+                .source_account(destination.getAccountNumber())
+                .title("test title")
+                .build();
+
+        // when
+        accountOperationService.transfer(transfer, destination.getAccountNumber());
+
+        // then
+        destination = accountsService.getAccount(destination.getAccountNumber());
+        Assertions.assertThat(accountOperationService.getAccountHistory(destination).size() - historySize).isEqualTo(1);
+        Assertions.assertThat(destination.getBalance()).isEqualTo(balance + TRANSFER_AMOUNT);
     }
 }
