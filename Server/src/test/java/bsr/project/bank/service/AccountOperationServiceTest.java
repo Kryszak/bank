@@ -1,9 +1,14 @@
 package bsr.project.bank.service;
 
-import bsr.project.bank.model.*;
+import bsr.project.bank.model.Account;
+import bsr.project.bank.model.AccountOperation;
+import bsr.project.bank.model.ExternalTransfer;
+import bsr.project.bank.model.User;
 import bsr.project.bank.webservice.external.ExternalBankClient;
 import com.bsr.types.bank.InternalTransferRequest;
 import com.bsr.types.bank.ObjectFactory;
+import com.bsr.types.bank.PaymentRequest;
+import com.bsr.types.bank.WithdrawalRequest;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -100,14 +105,12 @@ public class AccountOperationServiceTest {
         Account destination = accountsService.createAccount(user);
         int historySize = accountOperationService.getAccountHistory(destination).size();
         int balance = (int) destination.getBalance();
-        Payment payment = Payment
-                .builder()
-                .amount(TRANSFER_AMOUNT)
-                .destinationAccount(destination.getAccountNumber())
-                .build();
+        PaymentRequest paymentRequest = objectFactory.createPaymentRequest();
+        paymentRequest.setAmount(TRANSFER_AMOUNT);
+        paymentRequest.setDestinationAccount(destination.getAccountNumber());
 
         // when
-        accountOperationService.remittance(payment);
+        accountOperationService.remittance(paymentRequest);
 
         // then
         destination = accountsService.getAccount(destination.getAccountNumber());
@@ -123,14 +126,12 @@ public class AccountOperationServiceTest {
         Account destination = accountsService.createAccount(user);
         int historySize = accountOperationService.getAccountHistory(destination).size();
         int balance = (int) destination.getBalance();
-        Payment payment = Payment
-                .builder()
-                .amount(TRANSFER_AMOUNT)
-                .destinationAccount(destination.getAccountNumber())
-                .build();
+        WithdrawalRequest paymentRequest = objectFactory.createWithdrawalRequest();
+        paymentRequest.setDestinationAccount(destination.getAccountNumber());
+        paymentRequest.setAmount(TRANSFER_AMOUNT);
 
         // when
-        accountOperationService.withdrawal(payment);
+        accountOperationService.withdrawal(paymentRequest);
 
         // then
         destination = accountsService.getAccount(destination.getAccountNumber());

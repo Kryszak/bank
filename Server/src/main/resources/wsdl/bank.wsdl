@@ -20,6 +20,32 @@
                 </xsd:complexType>
             </xsd:element>
 
+            <xsd:element name="PaymentRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="destinationAccount" type="xsd:string"/>
+                        <xsd:element name="amount" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="WithdrawalRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="destinationAccount" type="xsd:string"/>
+                        <xsd:element name="amount" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="AccountHistoryRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="account" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
             <xsd:element name="OperationSuccessResponse">
                 <xsd:complexType>
                     <xsd:sequence>
@@ -27,6 +53,24 @@
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
+
+            <xsd:complexType name="AccountHistoryElement">
+                <xsd:sequence>
+                    <xsd:element name="title" type="xsd:string"/>
+                    <xsd:element name="amount" type="xsd:int"/>
+                    <xsd:element name="balance" type="xsd:int"/>
+                    <xsd:element name="sourceAccountNumber" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:element name="AccountHistoryResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="AccountHistory" type="types:AccountHistoryElement" maxOccurs="unbounded"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
         </xsd:schema>
     </wsdl:types>
 
@@ -38,10 +82,46 @@
         <wsdl:part name="InternalTransferResponse" element="types:OperationSuccessResponse"/>
     </wsdl:message>
 
+    <wsdl:message name="PaymentInput">
+        <wsdl:part name="PaymentRequest" element="types:PaymentRequest"/>
+    </wsdl:message>
+
+    <wsdl:message name="PaymentOutput">
+        <wsdl:part name="PaymentResponse" element="types:OperationSuccessResponse"/>
+    </wsdl:message>
+
+    <wsdl:message name="WithdrawalInput">
+        <wsdl:part name="WithdrawalRequest" element="types:WithdrawalRequest"/>
+    </wsdl:message>
+
+    <wsdl:message name="WithdrawalOutput">
+        <wsdl:part name="WithdrawalResponse" element="types:OperationSuccessResponse"/>
+    </wsdl:message>
+
+    <wsdl:message name="AccountHistoryInput">
+        <wsdl:part name="AccountHistoryRequest" element="types:AccountHistoryRequest"/>
+    </wsdl:message>
+
+    <wsdl:message name="AccountHistoryOutput">
+        <wsdl:part name="AccountHistoryResponse" element="types:AccountHistoryResponse"/>
+    </wsdl:message>
+
     <wsdl:portType name="Bank_PortType">
         <wsdl:operation name="internalTransfer">
             <wsdl:input message="tns:InternalTransferInput"/>
             <wsdl:output message="tns:InternalTransferOutput"/>
+        </wsdl:operation>
+        <wsdl:operation name="payment">
+            <wsdl:input message="tns:PaymentInput"/>
+            <wsdl:output message="tns:PaymentOutput"/>
+        </wsdl:operation>
+        <wsdl:operation name="withdrawal">
+            <wsdl:input message="tns:WithdrawalInput"/>
+            <wsdl:output message="tns:WithdrawalOutput"/>
+        </wsdl:operation>
+        <wsdl:operation name="accountHistory">
+            <wsdl:input message="tns:AccountHistoryInput"/>
+            <wsdl:output message="tns:AccountHistoryOutput"/>
         </wsdl:operation>
     </wsdl:portType>
 
@@ -50,6 +130,33 @@
                       transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="internalTransfer">
             <soap:operation soapAction="http://bsr.com/services/bank/internalTransfer"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="payment">
+            <soap:operation soapAction="http://bsr.com/services/bank/payment"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="withdrawal">
+            <soap:operation soapAction="http://bsr.com/services/bank/withdrawal"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="accountHistory">
+            <soap:operation soapAction="http://bsr.com/services/bank/accountHistory"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>

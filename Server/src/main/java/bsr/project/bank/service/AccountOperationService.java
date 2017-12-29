@@ -1,15 +1,19 @@
 package bsr.project.bank.service;
 
-import bsr.project.bank.model.*;
+import bsr.project.bank.model.Account;
+import bsr.project.bank.model.AccountOperation;
+import bsr.project.bank.model.ExternalTransfer;
+import bsr.project.bank.model.Transfer;
 import bsr.project.bank.service.data.AccountHistoryRepository;
 import bsr.project.bank.utility.logging.LogMethodCall;
 import bsr.project.bank.webservice.external.ExternalBankClient;
-import com.bsr.types.bank.InternalTransferRequest;
+import com.bsr.types.bank.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountOperationService {
@@ -26,6 +30,22 @@ public class AccountOperationService {
 
     @Autowired
     private ExternalBankClient externalBankClient;
+
+    @LogMethodCall
+    public List<AccountHistoryElement> getAccountHistory(AccountHistoryRequest payload) {
+        Account account = accountsService.getAccount(payload.getAccount());
+        return getAccountHistory(account)
+                .stream()
+                .map(operation -> {
+                    AccountHistoryElement element = new AccountHistoryElement();
+                    element.setAmount(operation.getAmount());
+                    element.setBalance(operation.getBalance());
+                    element.setSourceAccountNumber(operation.getSourceAccountNumber());
+                    element.setTitle(operation.getTitle());
+                    return element;
+                })
+                .collect(Collectors.toList());
+    }
 
     public List<AccountOperation> getAccountHistory(Account account) {
         return accountHistoryRepository.findByAccount(account);
@@ -78,7 +98,7 @@ public class AccountOperationService {
     }
 
     @LogMethodCall
-    public void remittance(Payment payment) {
+    public void remittance(PaymentRequest payment) {
         Account destination = accountsService.getAccount(payment.getDestinationAccount());
         Transfer transfer = Transfer
                 .builder()
@@ -93,7 +113,7 @@ public class AccountOperationService {
     }
 
     @LogMethodCall
-    public void withdrawal(Payment payment) {
+    public void withdrawal(WithdrawalRequest payment) {
         Account destination = accountsService.getAccount(payment.getDestinationAccount());
         Transfer transfer = Transfer
                 .builder()
