@@ -1,10 +1,10 @@
-package bsr.project.bank.webservice.external.validation;
+package bsr.project.bank.service.validation;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public class InvalidSourceAccountException extends Exception {
+public class InvalidDestinationAccountException extends Exception {
 
     @Getter
     private String description;

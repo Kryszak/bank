@@ -30,7 +30,6 @@ public class BankEndpoint {
         List<AccountHistoryElement> accountHistoryElements = accountOperationService.getAccountHistory(payload);
 
         AccountHistoryResponse response = new AccountHistoryResponse();
-
         response.getAccountHistory().addAll(accountHistoryElements);
 
         return response;
