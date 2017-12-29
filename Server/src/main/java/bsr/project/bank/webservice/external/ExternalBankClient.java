@@ -3,12 +3,15 @@ package bsr.project.bank.webservice.external;
 import bsr.project.bank.config.ExternalBankListService;
 import bsr.project.bank.model.ExternalTransfer;
 import bsr.project.bank.utility.logging.LogMethodCall;
+import bsr.project.bank.webservice.external.validation.ValidationError;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -34,7 +37,7 @@ public class ExternalBankClient {
 
         String bankCode = destinationAccount.substring(2, 10);
         String bankUrl = bankListService.getBankUrl(bankCode);
-        String url = bankUrl + uri.replace("{accountNumber}", destinationAccount);
+        String url = bankUrl + uri.replace("{accountNumber}", "1234");
 
         log.info("Requesting URL: {}", url);
 
@@ -46,8 +49,21 @@ public class ExternalBankClient {
                     Void.class);
 
         } catch (HttpClientErrorException ex) {
-            log.info("Request failed with status {}: {}", ex.getStatusCode(), ex.getMessage());
-            // TODO obsługa błędu rest
+            HttpStatus status = ex.getStatusCode();
+            log.info("Request failed with status {}: {}", status, ex.getMessage());
+            if (status.equals(HttpStatus.BAD_REQUEST)) {
+                ObjectMapper mapper = new ObjectMapper();
+                ValidationError error = mapper.readValue(ex.getResponseBodyAsString(), ValidationError.class);
+                log.info("Cause: {}", error);
+                // TODO Zwrotka do klienta
+            } else if (status.equals(HttpStatus.NOT_FOUND)) {
+                // TODO zwrotka do klienta
+            } else if (status.equals(HttpStatus.UNAUTHORIZED)) {
+                // TODO zwrotka do klienta
+            } else {
+                log.info("Unexpected error occured.");
+                // TODO zwrotka do klienta
+            }
         } catch (ResourceAccessException e) {
             log.info("{}", e.getMessage());
         }

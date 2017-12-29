@@ -1,11 +1,69 @@
 <?xml version="1.0"?>
 <wsdl:definitions name="Bank"
                   targetNamespace="http://bsr.com/services/bank"
-                  xmlns:tns="http://bsr.com/services/bank" xmlns:types="http://bsr.com/services/bank"
+                  xmlns:tns="http://bsr.com/services/bank" xmlns:types="http://bsr.com/types/bank"
                   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
 
     <wsdl:types>
+        <xsd:schema targetNamespace="http://bsr.com/types/bank"
+                    xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+                    version="1.0">
 
+            <xsd:element name="InternalTransferRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="sourceAccount" type="xsd:string"/>
+                        <xsd:element name="destinationAccount" type="xsd:string"/>
+                        <xsd:element name="title" type="xsd:string"/>
+                        <xsd:element name="amount" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="OperationSuccessResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="message" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
     </wsdl:types>
+
+    <wsdl:message name="InternalTransferInput">
+        <wsdl:part name="InternalTransferRequest" element="types:InternalTransferRequest"/>
+    </wsdl:message>
+
+    <wsdl:message name="InternalTransferOutput">
+        <wsdl:part name="InternalTransferResponse" element="types:OperationSuccessResponse"/>
+    </wsdl:message>
+
+    <wsdl:portType name="Bank_PortType">
+        <wsdl:operation name="internalTransfer">
+            <wsdl:input message="tns:InternalTransferInput"/>
+            <wsdl:output message="tns:InternalTransferOutput"/>
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="Bank_SoapBinding" type="tns:Bank_PortType">
+        <soap:binding style="document"
+                      transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="internalTransfer">
+            <soap:operation soapAction="http://bsr.com/services/bank/internalTransfer"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service name="Bank_Service">
+        <wsdl:documentation>Bank service</wsdl:documentation>
+        <wsdl:port name="Bank_Port" binding="tns:Bank_SoapBinding">
+            <soap:address location="http://localhost:8080/ws/bank"/>
+        </wsdl:port>
+    </wsdl:service>
 
 </wsdl:definitions>

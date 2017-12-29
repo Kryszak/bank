@@ -1,5 +1,6 @@
 package bsr.project.bank.model;
 
+import com.bsr.types.bank.InternalTransferRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,4 +19,13 @@ public class Transfer {
     private int amount;
 
     private String title;
+
+    public static Transfer fromSoapRequest(InternalTransferRequest request) {
+        return builder()
+                .title(request.getTitle())
+                .destinationAccount(request.getDestinationAccount())
+                .sourceAccount(request.getSourceAccount())
+                .amount(request.getAmount())
+                .build();
+    }
 }

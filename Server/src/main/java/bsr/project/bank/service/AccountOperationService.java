@@ -4,6 +4,7 @@ import bsr.project.bank.model.*;
 import bsr.project.bank.service.data.AccountHistoryRepository;
 import bsr.project.bank.utility.logging.LogMethodCall;
 import bsr.project.bank.webservice.external.ExternalBankClient;
+import com.bsr.types.bank.InternalTransferRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,7 @@ public class AccountOperationService {
 
     private static final String REMITTANCE = "WPŁATA";
 
-    private static final String WITDRAWAL = "WYPŁATA";
+    private static final String WITHDRAWAL = "WYPŁATA";
 
     @Autowired
     private AccountHistoryRepository accountHistoryRepository;
@@ -62,11 +63,12 @@ public class AccountOperationService {
     }
 
     @LogMethodCall
-    public void internalTransfer(Transfer transfer) {
+    public void internalTransfer(InternalTransferRequest payload) {
+        Transfer transfer = Transfer.fromSoapRequest(payload);
         Account sourceAccount = accountsService.getAccount(transfer.getSourceAccount());
-        long sourceAccountBalance = getAndUpdateSourceAccountBalance(transfer, sourceAccount);
-
         Account destinationAccount = accountsService.getAccount(transfer.getDestinationAccount());
+
+        long sourceAccountBalance = getAndUpdateSourceAccountBalance(transfer, sourceAccount);
         long destinationAccountBalance = getAndUpdateDestinationAccountBalance(transfer, destinationAccount);
 
         saveAccountOperationEvent(
@@ -98,7 +100,7 @@ public class AccountOperationService {
                 .amount(payment.getAmount())
                 .destinationAccount(destination.getAccountNumber())
                 .sourceAccount(destination.getAccountNumber())
-                .title(WITDRAWAL)
+                .title(WITHDRAWAL)
                 .build();
         long accountBalance = getAndUpdateSourceAccountBalance(transfer, destination);
         saveAccountOperationEvent(

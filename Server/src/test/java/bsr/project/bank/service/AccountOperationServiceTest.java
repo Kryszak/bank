@@ -2,6 +2,8 @@ package bsr.project.bank.service;
 
 import bsr.project.bank.model.*;
 import bsr.project.bank.webservice.external.ExternalBankClient;
+import com.bsr.types.bank.InternalTransferRequest;
+import com.bsr.types.bank.ObjectFactory;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,6 +33,8 @@ public class AccountOperationServiceTest {
 
     private static final int TRANSFER_AMOUNT = 100;
 
+    private ObjectFactory objectFactory = new ObjectFactory();
+
     @Test
     public void shouldHandleInternalTransfer() {
         // given
@@ -42,16 +46,15 @@ public class AccountOperationServiceTest {
         accountsService.updateAccount(source);
         destination.setBalance(1000);
         accountsService.updateAccount(destination);
-        Transfer transfer = Transfer
-                .builder()
-                .title("test transfer")
-                .sourceAccount(source.getAccountNumber())
-                .destinationAccount(destination.getAccountNumber())
-                .amount(TRANSFER_AMOUNT)
-                .build();
+
+        InternalTransferRequest payload = objectFactory.createInternalTransferRequest();
+        payload.setAmount(TRANSFER_AMOUNT);
+        payload.setSourceAccount(source.getAccountNumber());
+        payload.setDestinationAccount(destination.getAccountNumber());
+        payload.setTitle("test transfer");
 
         // when
-        accountOperationService.internalTransfer(transfer);
+        accountOperationService.internalTransfer(payload);
 
         //then
         List<AccountOperation> sourceHistory = accountOperationService.getAccountHistory(source);
