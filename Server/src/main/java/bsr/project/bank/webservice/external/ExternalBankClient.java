@@ -37,7 +37,7 @@ public class ExternalBankClient {
 
         String bankCode = destinationAccount.substring(2, 10);
         String bankUrl = bankListService.getBankUrl(bankCode);
-        String url = bankUrl + uri.replace("{accountNumber}", "1234");
+        String url = bankUrl + uri.replace("{accountNumber}", destinationAccount);
 
         log.info("Requesting URL: {}", url);
 

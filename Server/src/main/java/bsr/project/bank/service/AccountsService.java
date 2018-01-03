@@ -25,7 +25,7 @@ public class AccountsService {
     private NrbService nrbService;
 
     public boolean accountExists(String accountNumber) {
-        return accountRepository.exists(accountNumber);
+        return accountRepository.existsAccountByAccountNumber(accountNumber);
     }
 
     @LogMethodCall

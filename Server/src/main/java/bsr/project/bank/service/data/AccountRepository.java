@@ -10,4 +10,6 @@ public interface AccountRepository extends CrudRepository<Account, String> {
     List<Account> findAll();
 
     Account findByAccountNumber(String accountNumber);
+
+    boolean existsAccountByAccountNumber(String accountNumber);
 }
