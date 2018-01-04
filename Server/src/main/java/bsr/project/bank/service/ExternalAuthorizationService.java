@@ -2,12 +2,19 @@ package bsr.project.bank.service;
 
 import bsr.project.bank.utility.logging.LogMethodCall;
 import org.apache.http.auth.InvalidCredentialsException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
 
 @Service
 public class ExternalAuthorizationService {
+
+    @Value("${app.config.externalAuth.user}")
+    private String authUser;
+
+    @Value("${app.config.externalAuth.password}")
+    private String authPassword;
 
     @LogMethodCall
     public void authenticate(String authorizationHeader) throws InvalidCredentialsException {
@@ -19,7 +26,9 @@ public class ExternalAuthorizationService {
             String[] credentials = decoded.split(":");
             String username = credentials[0];
             String password = credentials[1];
-            // TODO
+            if (!username.equals(authUser) || !password.equals(authPassword)) {
+                throw new InvalidCredentialsException();
+            }
         } catch (Exception ex) {
             throw new InvalidCredentialsException();
         }

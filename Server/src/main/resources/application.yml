@@ -3,6 +3,9 @@ app:
     externalBankListFile: /home/kryszak/external.csv
     externalBankUri: "/accounts/{accountNumber}/history"
     bankCode: "00117298"
+    externalAuth:
+      user: "user"
+      password: "password"
 spring:
   h2:
     console:
