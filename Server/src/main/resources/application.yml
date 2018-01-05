@@ -4,8 +4,8 @@ app:
     externalBankUri: "/accounts/{accountNumber}/history"
     bankCode: "00117298"
     externalAuth:
-      user: "user"
-      password: "password"
+      user: "admin"
+      password: "admin"
 spring:
   h2:
     console:
