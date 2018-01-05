@@ -30,6 +30,12 @@ public class ExternalBankClient {
 
     @Value("${app.config.externalBankUri}")
     private String uri;
+    
+    @Value("${app.config.externalAuth.user}")
+    private String authUser;
+
+    @Value("${app.config.externalAuth.password}")
+    private String authPassword;
 
     @LogMethodCall
     public void requestExternalTransfer(ExternalTransfer transfer, String destinationAccount) throws IOException {
@@ -42,10 +48,9 @@ public class ExternalBankClient {
         log.info("Requesting URL: {}", url);
 
         try {
-            // TODO przepchanie usera i passów do basic auth
             ResponseEntity<Void> response = restTemplate.postForEntity(
                     url,
-                    new HttpEntity<>(transfer, createHeaders("TODO", "TODO")),
+                    new HttpEntity<>(transfer, createHeaders(authUser, authPassword)),
                     Void.class);
 
         } catch (HttpClientErrorException ex) {
