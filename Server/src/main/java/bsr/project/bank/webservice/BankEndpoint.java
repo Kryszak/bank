@@ -33,8 +33,10 @@ public class BankEndpoint {
 
     private ObjectFactory factory = new ObjectFactory();
 
+    private static final String NAMESPACE_URI = "http://bsr.com/types/bank";
+
     // TODO ulepszenie faultów, logowanie, autoryzacja
-    @PayloadRoot(namespace = "http://bsr.com/types/bank", localPart = "AccountHistoryRequest")
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "AccountHistoryRequest")
     @ResponsePayload
     public AccountHistoryResponse accountHistory(@RequestPayload AccountHistoryRequest payload) throws InvalidSourceAccountException {
         validator.validate(payload);
@@ -46,7 +48,7 @@ public class BankEndpoint {
         return response;
     }
 
-    @PayloadRoot(namespace = "http://bsr.com/types/bank", localPart = "InternalTransferRequest")
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "InternalTransferRequest")
     @ResponsePayload
     public OperationSuccessResponse internalTransfer(@RequestPayload InternalTransferRequest payload)
             throws InvalidSourceAccountException, InvalidAmountException,
@@ -61,7 +63,7 @@ public class BankEndpoint {
         return response;
     }
 
-    @PayloadRoot(namespace = "http://bsr.com/types/bank", localPart = "PaymentRequest")
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "PaymentRequest")
     @ResponsePayload
     public OperationSuccessResponse payment(@RequestPayload PaymentRequest payload)
             throws InvalidAmountException, InvalidDestinationAccountException {
@@ -75,7 +77,7 @@ public class BankEndpoint {
         return response;
     }
 
-    @PayloadRoot(namespace = "http://bsr.com/types/bank", localPart = "WithdrawalRequest")
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "WithdrawalRequest")
     @ResponsePayload
     public OperationSuccessResponse withdrawal(@RequestPayload WithdrawalRequest payload)
             throws InvalidAmountException, InvalidDestinationAccountException {
@@ -89,7 +91,7 @@ public class BankEndpoint {
         return response;
     }
 
-    @PayloadRoot(namespace = "http://bsr.com/types/bank", localPart = "ExternalTransferRequest")
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "ExternalTransferRequest")
     @ResponsePayload
     public OperationSuccessResponse externalTransfer(@RequestPayload ExternalTransferRequest payload)
             throws IOException,
