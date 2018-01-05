@@ -6,6 +6,10 @@ import bsr.project.bank.model.exception.UnknownErrorException;
 import bsr.project.bank.model.exception.ValidationErrorException;
 import bsr.project.bank.service.AccountOperationService;
 import bsr.project.bank.service.InternalOperationValidator;
+import bsr.project.bank.service.validation.InvalidAmountException;
+import bsr.project.bank.service.validation.InvalidDestinationAccountException;
+import bsr.project.bank.service.validation.InvalidSourceAccountException;
+import bsr.project.bank.service.validation.InvalidTitleException;
 import com.bsr.types.bank.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +33,11 @@ public class BankEndpoint {
 
     private ObjectFactory factory = new ObjectFactory();
 
+    // TODO ulepszenie faultów, logowanie, autoryzacja
     @PayloadRoot(namespace = "http://bsr.com/types/bank", localPart = "AccountHistoryRequest")
     @ResponsePayload
-    public AccountHistoryResponse accountHistory(@RequestPayload AccountHistoryRequest payload) {
+    public AccountHistoryResponse accountHistory(@RequestPayload AccountHistoryRequest payload) throws InvalidSourceAccountException {
+        validator.validate(payload);
         List<AccountHistoryElement> accountHistoryElements = accountOperationService.getAccountHistory(payload);
 
         AccountHistoryResponse response = new AccountHistoryResponse();
@@ -42,7 +48,10 @@ public class BankEndpoint {
 
     @PayloadRoot(namespace = "http://bsr.com/types/bank", localPart = "InternalTransferRequest")
     @ResponsePayload
-    public OperationSuccessResponse internalTransfer(@RequestPayload InternalTransferRequest payload) {
+    public OperationSuccessResponse internalTransfer(@RequestPayload InternalTransferRequest payload)
+            throws InvalidSourceAccountException, InvalidAmountException,
+            InvalidTitleException, InvalidDestinationAccountException {
+        validator.validate(payload);
         accountOperationService.internalTransfer(payload);
 
         OperationSuccessResponse response = factory.createOperationSuccessResponse();
@@ -54,7 +63,9 @@ public class BankEndpoint {
 
     @PayloadRoot(namespace = "http://bsr.com/types/bank", localPart = "PaymentRequest")
     @ResponsePayload
-    public OperationSuccessResponse payment(@RequestPayload PaymentRequest payload) {
+    public OperationSuccessResponse payment(@RequestPayload PaymentRequest payload)
+            throws InvalidAmountException, InvalidDestinationAccountException {
+        validator.validate(payload);
         accountOperationService.remittance(payload);
 
         OperationSuccessResponse response = factory.createOperationSuccessResponse();
@@ -66,7 +77,9 @@ public class BankEndpoint {
 
     @PayloadRoot(namespace = "http://bsr.com/types/bank", localPart = "WithdrawalRequest")
     @ResponsePayload
-    public OperationSuccessResponse withdrawal(@RequestPayload WithdrawalRequest payload) {
+    public OperationSuccessResponse withdrawal(@RequestPayload WithdrawalRequest payload)
+            throws InvalidAmountException, InvalidDestinationAccountException {
+        validator.validate(payload);
         accountOperationService.withdrawal(payload);
 
         OperationSuccessResponse response = factory.createOperationSuccessResponse();
@@ -83,7 +96,12 @@ public class BankEndpoint {
             AuthenticationFailedException,
             DestinationAccountnotFoundException,
             UnknownErrorException,
-            ValidationErrorException {
+            ValidationErrorException,
+            InvalidSourceAccountException,
+            InvalidAmountException,
+            InvalidTitleException,
+            InvalidDestinationAccountException {
+        validator.validate(payload);
         accountOperationService.externalTransfer(payload);
 
         OperationSuccessResponse response = factory.createOperationSuccessResponse();
