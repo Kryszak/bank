@@ -142,7 +142,7 @@ public class AccountOperationService {
         return AccountOperation
                 .builder()
                 .sourceAccountNumber(transfer.getSourceAccount())
-                .amount(-transfer.getAmount())
+                .amount(transfer.getAmount())
                 .balance(accountBalance)
                 .account(account)
                 .title(transfer.getTitle())
