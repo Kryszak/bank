@@ -30,7 +30,7 @@ public class ExternalRequestExceptionMapper {
     @ExceptionHandler(InvalidAmountException.class)
     public ValidationError handleInvalidTransferAmount(InvalidAmountException e) {
         log.error("", e);
-        return ValidationError.builder().errorField(AMOUNT).error("Błędna kwota przelewu.").build();
+        return ValidationError.builder().error_field(AMOUNT).error("Błędna kwota przelewu.").build();
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -39,7 +39,7 @@ public class ExternalRequestExceptionMapper {
         log.error("", e);
         return ValidationError
                 .builder()
-                .errorField(TITLE)
+                .error_field(TITLE)
                 .error("Błędny tytuł przelewu: " + e.getDescription())
                 .build();
     }
@@ -48,14 +48,14 @@ public class ExternalRequestExceptionMapper {
     @ExceptionHandler(InvalidSenderNameException.class)
     public ValidationError handleInvalidSenderName(InvalidSenderNameException e) {
         log.error("", e);
-        return ValidationError.builder().errorField(NAME).error("Nie podano zlecającego przelew").build();
+        return ValidationError.builder().error_field(NAME).error("Nie podano zlecającego przelew").build();
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(InvalidSourceAccountException.class)
     public ValidationError handleInvalidSourceAccount(InvalidSourceAccountException e) {
         log.error("", e);
-        return ValidationError.builder().errorField(SOURCE_ACCOUNT).error(e.getDescription()).build();
+        return ValidationError.builder().error_field(SOURCE_ACCOUNT).error(e.getDescription()).build();
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -68,6 +68,6 @@ public class ExternalRequestExceptionMapper {
     @ExceptionHandler(Exception.class)
     public ValidationError handleUnexpectedError(Exception e) {
         log.error("", e);
-        return ValidationError.builder().errorField("unknown").error("Wystąpił nieoczekiwany błąd.").build();
+        return ValidationError.builder().error_field("unknown").error("Wystąpił nieoczekiwany błąd.").build();
     }
 }

@@ -71,6 +71,17 @@
                 </xsd:complexType>
             </xsd:element>
 
+            <xsd:element name="ExternalTransferRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="sourceAccount" type="xsd:string"/>
+                        <xsd:element name="destinationAccount" type="xsd:string"/>
+                        <xsd:element name="title" type="xsd:string"/>
+                        <xsd:element name="name" type="xsd:string"/>
+                        <xsd:element name="amount" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
         </xsd:schema>
     </wsdl:types>
 
@@ -106,6 +117,14 @@
         <wsdl:part name="AccountHistoryResponse" element="types:AccountHistoryResponse"/>
     </wsdl:message>
 
+    <wsdl:message name="ExternalTransferInput">
+        <wsdl:part name="ExternalTransferRequest" element="types:ExternalTransferRequest"/>
+    </wsdl:message>
+
+    <wsdl:message name="ExternalTransferOutput">
+        <wsdl:part name="ExternalTransferResponse" element="types:OperationSuccessResponse"/>
+    </wsdl:message>
+
     <wsdl:portType name="Bank_PortType">
         <wsdl:operation name="internalTransfer">
             <wsdl:input message="tns:InternalTransferInput"/>
@@ -122,6 +141,10 @@
         <wsdl:operation name="accountHistory">
             <wsdl:input message="tns:AccountHistoryInput"/>
             <wsdl:output message="tns:AccountHistoryOutput"/>
+        </wsdl:operation>
+        <wsdl:operation name="externalTransfer">
+            <wsdl:input message="tns:ExternalTransferInput"/>
+            <wsdl:output message="ExternalTransferOutput"/>
         </wsdl:operation>
     </wsdl:portType>
 
@@ -157,6 +180,15 @@
         </wsdl:operation>
         <wsdl:operation name="accountHistory">
             <soap:operation soapAction="http://bsr.com/services/bank/accountHistory"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="externalTransfer">
+            <soap:operation soapAction="http://bsr.com/services/bank/externalTransfer"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>

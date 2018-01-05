@@ -4,6 +4,10 @@ import bsr.project.bank.model.Account;
 import bsr.project.bank.model.AccountOperation;
 import bsr.project.bank.model.ExternalTransfer;
 import bsr.project.bank.model.User;
+import bsr.project.bank.model.exception.AuthenticationFailedException;
+import bsr.project.bank.model.exception.DestinationAccountnotFoundException;
+import bsr.project.bank.model.exception.UnknownErrorException;
+import bsr.project.bank.model.exception.ValidationErrorException;
 import bsr.project.bank.webservice.external.ExternalBankClient;
 import com.bsr.types.bank.InternalTransferRequest;
 import com.bsr.types.bank.ObjectFactory;
@@ -140,7 +144,11 @@ public class AccountOperationServiceTest {
     }
 
     @Test
-    public void shouldHandleExternalTransfer() throws IOException {
+    public void shouldHandleExternalTransfer() throws IOException,
+            AuthenticationFailedException,
+            DestinationAccountnotFoundException,
+            UnknownErrorException,
+            ValidationErrorException {
         // given
         User user = User.builder().name("test").password("test").build();
         userService.createUser(user);

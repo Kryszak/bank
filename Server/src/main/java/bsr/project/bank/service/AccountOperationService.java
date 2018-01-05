@@ -4,6 +4,10 @@ import bsr.project.bank.model.Account;
 import bsr.project.bank.model.AccountOperation;
 import bsr.project.bank.model.ExternalTransfer;
 import bsr.project.bank.model.Transfer;
+import bsr.project.bank.model.exception.AuthenticationFailedException;
+import bsr.project.bank.model.exception.DestinationAccountnotFoundException;
+import bsr.project.bank.model.exception.UnknownErrorException;
+import bsr.project.bank.model.exception.ValidationErrorException;
 import bsr.project.bank.service.data.AccountHistoryRepository;
 import bsr.project.bank.utility.logging.LogMethodCall;
 import bsr.project.bank.webservice.external.ExternalBankClient;
@@ -51,8 +55,23 @@ public class AccountOperationService {
         return accountHistoryRepository.findByAccount(account);
     }
 
+    public void externalTransfer(ExternalTransferRequest payload)
+            throws ValidationErrorException,
+            AuthenticationFailedException,
+            DestinationAccountnotFoundException,
+            UnknownErrorException,
+            IOException {
+        ExternalTransfer transfer = ExternalTransfer.fromExternalTransferRequest(payload);
+        externalTransfer(transfer, payload.getDestinationAccount());
+    }
+
     @LogMethodCall
-    public void externalTransfer(ExternalTransfer transfer, String destinationAccount) throws IOException {
+    public void externalTransfer(ExternalTransfer transfer, String destinationAccount)
+            throws IOException,
+            AuthenticationFailedException,
+            DestinationAccountnotFoundException,
+            UnknownErrorException,
+            ValidationErrorException {
         Account sourceAccount = accountsService.getAccount(transfer.getSource_account());
         externalBankClient.requestExternalTransfer(transfer, destinationAccount);
         Transfer internal = Transfer
@@ -168,5 +187,4 @@ public class AccountOperationService {
     private void saveAccountOperationEvent(AccountOperation accountOperation) {
         accountHistoryRepository.save(accountOperation);
     }
-
 }

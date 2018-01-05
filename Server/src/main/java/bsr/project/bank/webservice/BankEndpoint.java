@@ -1,5 +1,9 @@
 package bsr.project.bank.webservice;
 
+import bsr.project.bank.model.exception.AuthenticationFailedException;
+import bsr.project.bank.model.exception.DestinationAccountnotFoundException;
+import bsr.project.bank.model.exception.UnknownErrorException;
+import bsr.project.bank.model.exception.ValidationErrorException;
 import bsr.project.bank.service.AccountOperationService;
 import bsr.project.bank.service.InternalOperationValidator;
 import com.bsr.types.bank.*;
@@ -10,6 +14,7 @@ import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -67,6 +72,23 @@ public class BankEndpoint {
         OperationSuccessResponse response = factory.createOperationSuccessResponse();
 
         response.setMessage("Wypłacono pieniądze");
+
+        return response;
+    }
+
+    @PayloadRoot(namespace = "http://bsr.com/types/bank", localPart = "ExternalTransferRequest")
+    @ResponsePayload
+    public OperationSuccessResponse externalTransfer(@RequestPayload ExternalTransferRequest payload)
+            throws IOException,
+            AuthenticationFailedException,
+            DestinationAccountnotFoundException,
+            UnknownErrorException,
+            ValidationErrorException {
+        accountOperationService.externalTransfer(payload);
+
+        OperationSuccessResponse response = factory.createOperationSuccessResponse();
+
+        response.setMessage("Przelew przyjęty.");
 
         return response;
     }

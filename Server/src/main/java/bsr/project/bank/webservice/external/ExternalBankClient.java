@@ -2,6 +2,10 @@ package bsr.project.bank.webservice.external;
 
 import bsr.project.bank.config.ExternalBankListService;
 import bsr.project.bank.model.ExternalTransfer;
+import bsr.project.bank.model.exception.AuthenticationFailedException;
+import bsr.project.bank.model.exception.DestinationAccountnotFoundException;
+import bsr.project.bank.model.exception.UnknownErrorException;
+import bsr.project.bank.model.exception.ValidationErrorException;
 import bsr.project.bank.utility.logging.LogMethodCall;
 import bsr.project.bank.webservice.external.validation.ValidationError;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,7 +45,7 @@ public class ExternalBankClient {
     private int connectTimeout;
 
     @LogMethodCall
-    public void requestExternalTransfer(ExternalTransfer transfer, String destinationAccount) throws IOException {
+    public void requestExternalTransfer(ExternalTransfer transfer, String destinationAccount) throws IOException, DestinationAccountnotFoundException, UnknownErrorException, AuthenticationFailedException, ValidationErrorException {
         RestTemplateBuilder builder = new RestTemplateBuilder();
         RestTemplate restTemplate = builder
                 .basicAuthorization(authUser, authPassword)
@@ -68,14 +72,14 @@ public class ExternalBankClient {
                 ObjectMapper mapper = new ObjectMapper();
                 ValidationError error = mapper.readValue(ex.getResponseBodyAsString(), ValidationError.class);
                 log.info("Cause: {}", error);
-                // TODO Zwrotka do klienta
+                throw new ValidationErrorException(error);
             } else if (status.equals(HttpStatus.NOT_FOUND)) {
-                // TODO zwrotka do klienta
+                throw new DestinationAccountnotFoundException();
             } else if (status.equals(HttpStatus.UNAUTHORIZED)) {
-                // TODO zwrotka do klienta
+                throw new AuthenticationFailedException();
             } else {
                 log.info("Unexpected error occured.");
-                // TODO zwrotka do klienta
+                throw new UnknownErrorException();
             }
         } catch (ResourceAccessException e) {
             log.info("{}", e.getMessage());

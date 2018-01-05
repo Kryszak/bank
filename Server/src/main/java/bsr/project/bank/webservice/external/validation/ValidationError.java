@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ValidationError {
 
-    // TODO error_field
-    private String errorField;
+    private String error_field;
 
     private String error;
 }
