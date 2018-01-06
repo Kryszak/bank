@@ -35,7 +35,7 @@ public class BankEndpoint {
 
     private static final String NAMESPACE_URI = "http://bsr.com/types/bank";
 
-    // TODO ulepszenie faultów, logowanie, autoryzacja
+    // TODO logowanie, autoryzacja
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "AccountHistoryRequest")
     @ResponsePayload
     public AccountHistoryResponse accountHistory(@RequestPayload AccountHistoryRequest payload) throws InvalidSourceAccountException {

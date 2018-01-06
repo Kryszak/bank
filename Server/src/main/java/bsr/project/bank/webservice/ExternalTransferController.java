@@ -1,12 +1,8 @@
 package bsr.project.bank.webservice;
 
 import bsr.project.bank.model.ExternalTransfer;
-import bsr.project.bank.service.validation.InvalidAmountException;
-import bsr.project.bank.service.validation.InvalidSenderNameException;
-import bsr.project.bank.service.validation.InvalidSourceAccountException;
-import bsr.project.bank.service.validation.InvalidTitleException;
+import bsr.project.bank.service.validation.*;
 import bsr.project.bank.webservice.external.ExternalRequestHandler;
-import bsr.project.bank.webservice.external.validation.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.auth.InvalidCredentialsException;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,10 +1,7 @@
 package bsr.project.bank.service;
 
-import bsr.project.bank.service.validation.InvalidDestinationAccountException;
-import bsr.project.bank.service.validation.InvalidAmountException;
-import bsr.project.bank.service.validation.InvalidSenderNameException;
-import bsr.project.bank.service.validation.InvalidSourceAccountException;
-import bsr.project.bank.service.validation.InvalidTitleException;
+import bsr.project.bank.service.validation.*;
+import bsr.project.bank.service.validation.AccountDoesNotExistsException;
 import org.iban4j.IbanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -13,13 +10,14 @@ public abstract class AbstractRequestsValidator {
     @Autowired
     protected AccountsService accountsService;
 
-    protected void validateSourceAccount(String sourceAccount) throws InvalidSourceAccountException {
+    protected void validateSourceAccount(String sourceAccount) throws InvalidSourceAccountException, AccountDoesNotExistsException {
         if (sourceAccount == null || sourceAccount.isEmpty()) {
             throw new InvalidSourceAccountException("Nie podano numeru konta zlecającego.");
         }
         if (sourceAccount.length() != 26) {
             throw new InvalidSourceAccountException("Numer rachunku musi zawierać 26 cyfr.");
         }
+        validate(sourceAccount);
         try {
             IbanUtil.validate("PL" + sourceAccount);
         } catch (Exception e) {
@@ -27,17 +25,24 @@ public abstract class AbstractRequestsValidator {
         }
     }
 
-    protected void validateDestinationAccount(String destinationAccount) throws InvalidDestinationAccountException {
+    protected void validateDestinationAccount(String destinationAccount) throws InvalidDestinationAccountException, AccountDoesNotExistsException {
         if (destinationAccount == null || destinationAccount.isEmpty()) {
             throw new InvalidDestinationAccountException("Nie podano numeru konta docelowego.");
         }
         if (destinationAccount.length() != 26) {
             throw new InvalidDestinationAccountException("Numer rachunku musi zawierać 26 cyfr.");
         }
+        validate(destinationAccount);
         try {
             IbanUtil.validate("PL" + destinationAccount);
         } catch (Exception e) {
             throw new InvalidDestinationAccountException("Błędny numer rachunku.");
+        }
+    }
+
+    public void validate(String accountNumber) throws AccountDoesNotExistsException {
+        if (!accountsService.accountExists(accountNumber)) {
+            throw new AccountDoesNotExistsException();
         }
     }
 

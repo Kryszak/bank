@@ -13,13 +13,6 @@ import org.springframework.stereotype.Service;
 public class ExternalRequestValidator extends AbstractRequestsValidator {
 
     @LogMethodCall
-    public void validate(String accountNumber) throws AccountDoesNotExistsException {
-        if (!accountsService.accountExists(accountNumber)) {
-            throw new AccountDoesNotExistsException();
-        }
-    }
-
-    @LogMethodCall
     public void validate(ExternalTransfer transfer)
             throws InvalidAmountException, InvalidTitleException, InvalidSenderNameException, InvalidSourceAccountException {
         validateAmount(transfer.getAmount());
