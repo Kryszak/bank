@@ -6,10 +6,7 @@ import bsr.project.bank.model.exception.UnknownErrorException;
 import bsr.project.bank.model.exception.ValidationErrorException;
 import bsr.project.bank.service.AccountOperationService;
 import bsr.project.bank.service.InternalOperationValidator;
-import bsr.project.bank.service.validation.InvalidAmountException;
-import bsr.project.bank.service.validation.InvalidDestinationAccountException;
-import bsr.project.bank.service.validation.InvalidSourceAccountException;
-import bsr.project.bank.service.validation.InvalidTitleException;
+import bsr.project.bank.service.validation.*;
 import com.bsr.types.bank.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +35,7 @@ public class BankEndpoint {
     // TODO logowanie, autoryzacja
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "AccountHistoryRequest")
     @ResponsePayload
-    public AccountHistoryResponse accountHistory(@RequestPayload AccountHistoryRequest payload) throws InvalidSourceAccountException {
+    public AccountHistoryResponse accountHistory(@RequestPayload AccountHistoryRequest payload) throws InvalidSourceAccountException, AccountDoesNotExistsException {
         validator.validate(payload);
         List<AccountHistoryElement> accountHistoryElements = accountOperationService.getAccountHistory(payload);
 
@@ -52,7 +49,7 @@ public class BankEndpoint {
     @ResponsePayload
     public OperationSuccessResponse internalTransfer(@RequestPayload InternalTransferRequest payload)
             throws InvalidSourceAccountException, InvalidAmountException,
-            InvalidTitleException, InvalidDestinationAccountException {
+            InvalidTitleException, InvalidDestinationAccountException, AccountDoesNotExistsException {
         validator.validate(payload);
         accountOperationService.internalTransfer(payload);
 
@@ -66,7 +63,7 @@ public class BankEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "PaymentRequest")
     @ResponsePayload
     public OperationSuccessResponse payment(@RequestPayload PaymentRequest payload)
-            throws InvalidAmountException, InvalidDestinationAccountException {
+            throws InvalidAmountException, InvalidDestinationAccountException, AccountDoesNotExistsException {
         validator.validate(payload);
         accountOperationService.remittance(payload);
 
@@ -80,7 +77,7 @@ public class BankEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "WithdrawalRequest")
     @ResponsePayload
     public OperationSuccessResponse withdrawal(@RequestPayload WithdrawalRequest payload)
-            throws InvalidAmountException, InvalidDestinationAccountException {
+            throws InvalidAmountException, InvalidDestinationAccountException, AccountDoesNotExistsException {
         validator.validate(payload);
         accountOperationService.withdrawal(payload);
 
@@ -102,7 +99,7 @@ public class BankEndpoint {
             InvalidSourceAccountException,
             InvalidAmountException,
             InvalidTitleException,
-            InvalidDestinationAccountException {
+            InvalidDestinationAccountException, AccountDoesNotExistsException {
         validator.validate(payload);
         accountOperationService.externalTransfer(payload);
 
