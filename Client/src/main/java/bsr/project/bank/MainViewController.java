@@ -30,6 +30,10 @@ public class MainViewController {
     @FXML
     private Button loginButton;
 
+    @FXML
+
+    private Button logoutButton;
+
     // payment
     @FXML
     private Button paymentButton;
@@ -101,11 +105,21 @@ public class MainViewController {
     @FXML
     private void initialize() {
         loginButton.setOnMouseClicked(getLogInEventEventHandler());
+        logoutButton.setOnMouseClicked(getLogoutEventEventHandler());
         paymentButton.setOnMouseClicked(getPaymentEventEventHandler());
         withdrawButton.setOnMouseClicked(getWithdrawEventEventHandler());
         historyButton.setOnMouseClicked(getHistoryEventEventHandler());
         internalTransferButton.setOnMouseClicked(getInternalTransferEventEventHandler());
         externalTransferButton.setOnMouseClicked(getExternalTransferEventEventHandler());
+    }
+
+    private EventHandler<MouseEvent> getLogoutEventEventHandler() {
+        return event -> {
+            CredentialsHolder.username = "";
+            CredentialsHolder.password = "";
+            loginForm.visibleProperty().setValue(true);
+            bankForm.visibleProperty().setValue(false);
+        };
     }
 
     private EventHandler<MouseEvent> getExternalTransferEventEventHandler() {
@@ -182,6 +196,8 @@ public class MainViewController {
             String username = userText.getText();
             String password = passwordText.getText();
             if (validString(username) && validString(password)) {
+                userText.setText("");
+                passwordText.setText("");
                 // TODO request logowania
                 loginForm.visibleProperty().setValue(false);
                 bankForm.visibleProperty().setValue(true);
