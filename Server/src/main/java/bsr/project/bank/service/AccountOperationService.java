@@ -5,7 +5,7 @@ import bsr.project.bank.model.AccountOperation;
 import bsr.project.bank.model.ExternalTransfer;
 import bsr.project.bank.model.Transfer;
 import bsr.project.bank.model.exception.AuthenticationFailedException;
-import bsr.project.bank.model.exception.DestinationAccountnotFoundException;
+import bsr.project.bank.model.exception.DestinationAccountNotFoundException;
 import bsr.project.bank.model.exception.UnknownErrorException;
 import bsr.project.bank.model.exception.ValidationErrorException;
 import bsr.project.bank.service.data.AccountHistoryRepository;
@@ -58,7 +58,7 @@ public class AccountOperationService {
     public void externalTransfer(ExternalTransferRequest payload)
             throws ValidationErrorException,
             AuthenticationFailedException,
-            DestinationAccountnotFoundException,
+            DestinationAccountNotFoundException,
             UnknownErrorException,
             IOException {
         ExternalTransfer transfer = ExternalTransfer.fromExternalTransferRequest(payload);
@@ -69,7 +69,7 @@ public class AccountOperationService {
     public void externalTransfer(ExternalTransfer transfer, String destinationAccount)
             throws IOException,
             AuthenticationFailedException,
-            DestinationAccountnotFoundException,
+            DestinationAccountNotFoundException,
             UnknownErrorException,
             ValidationErrorException {
         Account sourceAccount = accountsService.getAccount(transfer.getSource_account());

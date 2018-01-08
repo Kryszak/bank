@@ -14,7 +14,7 @@ import org.springframework.ws.wsdl.wsdl11.Wsdl11Definition;
 @EnableWs
 @Configuration
 public class WebServiceConfiguration extends WsConfigurerAdapter {
-
+    
     @Bean
     public ServletRegistrationBean messageDispatcherServlet(ApplicationContext applicationContext) {
         MessageDispatcherServlet servlet = new MessageDispatcherServlet();

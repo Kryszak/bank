@@ -5,7 +5,7 @@ import bsr.project.bank.model.AccountOperation;
 import bsr.project.bank.model.ExternalTransfer;
 import bsr.project.bank.model.User;
 import bsr.project.bank.model.exception.AuthenticationFailedException;
-import bsr.project.bank.model.exception.DestinationAccountnotFoundException;
+import bsr.project.bank.model.exception.DestinationAccountNotFoundException;
 import bsr.project.bank.model.exception.UnknownErrorException;
 import bsr.project.bank.model.exception.ValidationErrorException;
 import bsr.project.bank.webservice.external.ExternalBankClient;
@@ -146,7 +146,7 @@ public class AccountOperationServiceTest {
     @Test
     public void shouldHandleExternalTransfer() throws IOException,
             AuthenticationFailedException,
-            DestinationAccountnotFoundException,
+            DestinationAccountNotFoundException,
             UnknownErrorException,
             ValidationErrorException {
         // given

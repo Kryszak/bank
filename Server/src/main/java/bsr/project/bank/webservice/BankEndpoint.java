@@ -1,7 +1,7 @@
 package bsr.project.bank.webservice;
 
 import bsr.project.bank.model.exception.AuthenticationFailedException;
-import bsr.project.bank.model.exception.DestinationAccountnotFoundException;
+import bsr.project.bank.model.exception.DestinationAccountNotFoundException;
 import bsr.project.bank.model.exception.UnknownErrorException;
 import bsr.project.bank.model.exception.ValidationErrorException;
 import bsr.project.bank.service.AccountOperationService;
@@ -14,7 +14,12 @@ import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
+import org.springframework.ws.soap.SoapHeaderElement;
+import org.springframework.ws.soap.server.endpoint.annotation.SoapHeader;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.util.List;
 
@@ -32,10 +37,14 @@ public class BankEndpoint {
 
     private static final String NAMESPACE_URI = "http://bsr.com/types/bank";
 
-    // TODO logowanie, autoryzacja
+    // TODO logowanie
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "AccountHistoryRequest")
     @ResponsePayload
-    public AccountHistoryResponse accountHistory(@RequestPayload AccountHistoryRequest payload) throws InvalidSourceAccountException, AccountDoesNotExistsException {
+    public AccountHistoryResponse accountHistory(@RequestPayload AccountHistoryRequest payload,
+                                                 @SoapHeader("{http://bsr.com/types/bank}AuthHeader") SoapHeaderElement auth)
+            throws InvalidSourceAccountException, AccountDoesNotExistsException, JAXBException, AuthenticationFailedException {
+        authenticate(auth);
+
         validator.validate(payload);
         List<AccountHistoryElement> accountHistoryElements = accountOperationService.getAccountHistory(payload);
 
@@ -47,9 +56,12 @@ public class BankEndpoint {
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "InternalTransferRequest")
     @ResponsePayload
-    public OperationSuccessResponse internalTransfer(@RequestPayload InternalTransferRequest payload)
+    public OperationSuccessResponse internalTransfer(@RequestPayload InternalTransferRequest payload,
+                                                     @SoapHeader("{http://bsr.com/types/bank}AuthHeader") SoapHeaderElement auth)
             throws InvalidSourceAccountException, InvalidAmountException,
-            InvalidTitleException, InvalidDestinationAccountException, AccountDoesNotExistsException {
+            InvalidTitleException, InvalidDestinationAccountException, AccountDoesNotExistsException, JAXBException, AuthenticationFailedException {
+        authenticate(auth);
+
         validator.validate(payload);
         accountOperationService.internalTransfer(payload);
 
@@ -62,8 +74,11 @@ public class BankEndpoint {
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "PaymentRequest")
     @ResponsePayload
-    public OperationSuccessResponse payment(@RequestPayload PaymentRequest payload)
-            throws InvalidAmountException, InvalidDestinationAccountException, AccountDoesNotExistsException {
+    public OperationSuccessResponse payment(@RequestPayload PaymentRequest payload,
+                                            @SoapHeader("{http://bsr.com/types/bank}AuthHeader") SoapHeaderElement auth)
+            throws InvalidAmountException, InvalidDestinationAccountException, AccountDoesNotExistsException, JAXBException, AuthenticationFailedException {
+        authenticate(auth);
+
         validator.validate(payload);
         accountOperationService.remittance(payload);
 
@@ -76,8 +91,11 @@ public class BankEndpoint {
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "WithdrawalRequest")
     @ResponsePayload
-    public OperationSuccessResponse withdrawal(@RequestPayload WithdrawalRequest payload)
-            throws InvalidAmountException, InvalidDestinationAccountException, AccountDoesNotExistsException {
+    public OperationSuccessResponse withdrawal(@RequestPayload WithdrawalRequest payload,
+                                               @SoapHeader("{http://bsr.com/types/bank}AuthHeader") SoapHeaderElement auth)
+            throws InvalidAmountException, InvalidDestinationAccountException, AccountDoesNotExistsException, JAXBException, AuthenticationFailedException {
+        authenticate(auth);
+
         validator.validate(payload);
         accountOperationService.withdrawal(payload);
 
@@ -90,16 +108,19 @@ public class BankEndpoint {
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "ExternalTransferRequest")
     @ResponsePayload
-    public OperationSuccessResponse externalTransfer(@RequestPayload ExternalTransferRequest payload)
+    public OperationSuccessResponse externalTransfer(@RequestPayload ExternalTransferRequest payload,
+                                                     @SoapHeader("{http://bsr.com/types/bank}AuthHeader") SoapHeaderElement auth)
             throws IOException,
             AuthenticationFailedException,
-            DestinationAccountnotFoundException,
+            DestinationAccountNotFoundException,
             UnknownErrorException,
             ValidationErrorException,
             InvalidSourceAccountException,
             InvalidAmountException,
             InvalidTitleException,
-            InvalidDestinationAccountException, AccountDoesNotExistsException {
+            InvalidDestinationAccountException, AccountDoesNotExistsException, JAXBException {
+        authenticate(auth);
+
         validator.validate(payload);
         accountOperationService.externalTransfer(payload);
 
@@ -108,5 +129,12 @@ public class BankEndpoint {
         response.setMessage("Przelew przyjęty.");
 
         return response;
+    }
+
+    private void authenticate(SoapHeaderElement auth) throws JAXBException, AuthenticationFailedException {
+        JAXBContext context = JAXBContext.newInstance(AuthHeader.class);
+        Unmarshaller unmarshaller = context.createUnmarshaller();
+        AuthHeader authentication = (AuthHeader) unmarshaller.unmarshal(auth.getSource());
+        validator.checkAuthenticated(authentication);
     }
 }

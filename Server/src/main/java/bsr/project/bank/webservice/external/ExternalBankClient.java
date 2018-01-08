@@ -3,7 +3,7 @@ package bsr.project.bank.webservice.external;
 import bsr.project.bank.config.ExternalBankListService;
 import bsr.project.bank.model.ExternalTransfer;
 import bsr.project.bank.model.exception.AuthenticationFailedException;
-import bsr.project.bank.model.exception.DestinationAccountnotFoundException;
+import bsr.project.bank.model.exception.DestinationAccountNotFoundException;
 import bsr.project.bank.model.exception.UnknownErrorException;
 import bsr.project.bank.model.exception.ValidationErrorException;
 import bsr.project.bank.utility.logging.LogMethodCall;
@@ -45,7 +45,7 @@ public class ExternalBankClient {
     private int connectTimeout;
 
     @LogMethodCall
-    public void requestExternalTransfer(ExternalTransfer transfer, String destinationAccount) throws IOException, DestinationAccountnotFoundException, UnknownErrorException, AuthenticationFailedException, ValidationErrorException {
+    public void requestExternalTransfer(ExternalTransfer transfer, String destinationAccount) throws IOException, DestinationAccountNotFoundException, UnknownErrorException, AuthenticationFailedException, ValidationErrorException {
         RestTemplateBuilder builder = new RestTemplateBuilder();
         RestTemplate restTemplate = builder
                 .basicAuthorization(authUser, authPassword)
@@ -74,7 +74,7 @@ public class ExternalBankClient {
                 log.info("Cause: {}", error);
                 throw new ValidationErrorException(error);
             } else if (status.equals(HttpStatus.NOT_FOUND)) {
-                throw new DestinationAccountnotFoundException();
+                throw new DestinationAccountNotFoundException();
             } else if (status.equals(HttpStatus.UNAUTHORIZED)) {
                 throw new AuthenticationFailedException();
             } else {

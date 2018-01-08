@@ -1,20 +1,20 @@
 package bsr.project.bank.service;
 
-import bsr.project.bank.service.validation.InvalidAmountException;
-import bsr.project.bank.service.validation.InvalidDestinationAccountException;
-import bsr.project.bank.service.validation.InvalidSourceAccountException;
-import bsr.project.bank.service.validation.InvalidTitleException;
+import bsr.project.bank.model.exception.AuthenticationFailedException;
+import bsr.project.bank.service.validation.*;
 import bsr.project.bank.utility.logging.LogMethodCall;
-import bsr.project.bank.service.validation.AccountDoesNotExistsException;
 import com.bsr.types.bank.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class InternalOperationValidator extends AbstractRequestsValidator {
 
-    @LogMethodCall
-    public void checkAuthenticated() {
+    @Autowired
+    private UserService userService;
 
+    public void checkAuthenticated(AuthHeader authHeader) throws AuthenticationFailedException {
+        userService.authenticate(authHeader);
     }
 
     @LogMethodCall

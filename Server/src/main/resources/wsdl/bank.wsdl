@@ -9,6 +9,15 @@
                     xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
                     version="1.0">
 
+            <xsd:element name="AuthHeader">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="username" type="xsd:string"/>
+                        <xsd:element name="password" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
             <xsd:element name="InternalTransferRequest">
                 <xsd:complexType>
                     <xsd:sequence>
@@ -85,6 +94,10 @@
         </xsd:schema>
     </wsdl:types>
 
+    <wsdl:message name="AuthHeader">
+        <wsdl:part name="header" element="types:AuthHeader"/>
+    </wsdl:message>
+
     <wsdl:message name="InternalTransferInput">
         <wsdl:part name="InternalTransferRequest" element="types:InternalTransferRequest"/>
     </wsdl:message>
@@ -154,6 +167,7 @@
         <wsdl:operation name="internalTransfer">
             <soap:operation soapAction="http://bsr.com/services/bank/internalTransfer"/>
             <wsdl:input>
+                <soap:header message="tns:AuthHeader" part="header" use="literal"/>
                 <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
@@ -163,6 +177,7 @@
         <wsdl:operation name="payment">
             <soap:operation soapAction="http://bsr.com/services/bank/payment"/>
             <wsdl:input>
+                <soap:header message="tns:AuthHeader" part="header" use="literal"/>
                 <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
@@ -172,6 +187,7 @@
         <wsdl:operation name="withdrawal">
             <soap:operation soapAction="http://bsr.com/services/bank/withdrawal"/>
             <wsdl:input>
+                <soap:header message="tns:AuthHeader" part="header" use="literal"/>
                 <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
@@ -181,6 +197,7 @@
         <wsdl:operation name="accountHistory">
             <soap:operation soapAction="http://bsr.com/services/bank/accountHistory"/>
             <wsdl:input>
+                <soap:header message="tns:AuthHeader" part="header" use="literal"/>
                 <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
@@ -190,9 +207,11 @@
         <wsdl:operation name="externalTransfer">
             <soap:operation soapAction="http://bsr.com/services/bank/externalTransfer"/>
             <wsdl:input>
+                <soap:header message="tns:AuthHeader" part="header" use="literal"/>
                 <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
+                <soap:header message="tns:AuthHeader" part="header" use="literal"/>
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
