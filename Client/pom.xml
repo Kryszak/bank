@@ -5,10 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>bsr.project</groupId>
-    <artifactId>client</artifactId>
+    <artifactId>bank-client</artifactId>
     <version>1.0-SNAPSHOT</version>
-
-    <packaging>jar</packaging>
 
     <build>
         <finalName>client</finalName>
@@ -49,4 +47,5 @@
             </plugin>
         </plugins>
     </build>
+    
 </project>
