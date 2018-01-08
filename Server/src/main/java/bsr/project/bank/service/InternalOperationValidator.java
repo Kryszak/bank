@@ -1,5 +1,6 @@
 package bsr.project.bank.service;
 
+import bsr.project.bank.model.User;
 import bsr.project.bank.model.exception.AuthenticationFailedException;
 import bsr.project.bank.service.validation.*;
 import bsr.project.bank.utility.logging.LogMethodCall;
@@ -13,8 +14,8 @@ public class InternalOperationValidator extends AbstractRequestsValidator {
     @Autowired
     private UserService userService;
 
-    public void checkAuthenticated(AuthHeader authHeader) throws AuthenticationFailedException {
-        userService.authenticate(authHeader);
+    public User checkAuthenticated(AuthHeader authHeader) throws AuthenticationFailedException {
+        return userService.authenticate(authHeader);
     }
 
     @LogMethodCall

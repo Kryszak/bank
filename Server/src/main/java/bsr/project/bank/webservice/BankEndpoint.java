@@ -1,10 +1,12 @@
 package bsr.project.bank.webservice;
 
+import bsr.project.bank.model.User;
 import bsr.project.bank.model.exception.AuthenticationFailedException;
 import bsr.project.bank.model.exception.DestinationAccountNotFoundException;
 import bsr.project.bank.model.exception.UnknownErrorException;
 import bsr.project.bank.model.exception.ValidationErrorException;
 import bsr.project.bank.service.AccountOperationService;
+import bsr.project.bank.service.AccountsService;
 import bsr.project.bank.service.InternalOperationValidator;
 import bsr.project.bank.service.validation.*;
 import com.bsr.types.bank.*;
@@ -22,6 +24,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Endpoint
@@ -33,11 +36,20 @@ public class BankEndpoint {
     @Autowired
     private AccountOperationService accountOperationService;
 
+    @Autowired
+    private AccountsService accountsService;
+
     private ObjectFactory factory = new ObjectFactory();
 
     private static final String NAMESPACE_URI = "http://bsr.com/types/bank";
 
-    // TODO logowanie
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "LoginRequest")
+    @ResponsePayload
+    public LoginResponse login(@SoapHeader("{http://bsr.com/types/bank}AuthHeader") SoapHeaderElement auth) throws JAXBException, AuthenticationFailedException {
+        User user = authenticate(auth);
+        return getLoginResponse(user);
+    }
+
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "AccountHistoryRequest")
     @ResponsePayload
     public AccountHistoryResponse accountHistory(@RequestPayload AccountHistoryRequest payload,
@@ -131,10 +143,21 @@ public class BankEndpoint {
         return response;
     }
 
-    private void authenticate(SoapHeaderElement auth) throws JAXBException, AuthenticationFailedException {
+    private User authenticate(SoapHeaderElement auth) throws JAXBException, AuthenticationFailedException {
         JAXBContext context = JAXBContext.newInstance(AuthHeader.class);
         Unmarshaller unmarshaller = context.createUnmarshaller();
         AuthHeader authentication = (AuthHeader) unmarshaller.unmarshal(auth.getSource());
-        validator.checkAuthenticated(authentication);
+        return validator.checkAuthenticated(authentication);
+    }
+
+    private LoginResponse getLoginResponse(User user) {
+        LoginResponse response = factory.createLoginResponse();
+        response.getAccounts().addAll(accountsService.getUserAccounts(user).stream().map(account -> {
+            AccountsElement acc = factory.createAccountsElement();
+            acc.setAccountNumber(account.getAccountNumber());
+            acc.setBalance((int) account.getBalance());
+            return acc;
+        }).collect(Collectors.toList()));
+        return response;
     }
 }

@@ -24,6 +24,11 @@ public class AccountsService {
     @Autowired
     private NrbService nrbService;
 
+    public List<Account> getUserAccounts(User user) {
+        return accountRepository.findByUser(user);
+    }
+
+    @LogMethodCall
     public boolean accountExists(String accountNumber) {
         return accountRepository.existsAccountByAccountNumber(accountNumber);
     }
