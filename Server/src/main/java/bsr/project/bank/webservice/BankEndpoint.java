@@ -55,9 +55,9 @@ public class BankEndpoint {
     public AccountHistoryResponse accountHistory(@RequestPayload AccountHistoryRequest payload,
                                                  @SoapHeader("{http://bsr.com/types/bank}AuthHeader") SoapHeaderElement auth)
             throws InvalidSourceAccountException, AccountDoesNotExistsException, JAXBException, AuthenticationFailedException {
-        authenticate(auth);
+        User user = authenticate(auth);
 
-        validator.validate(payload);
+        validator.validate(payload, user);
         List<AccountHistoryElement> accountHistoryElements = accountOperationService.getAccountHistory(payload);
 
         AccountHistoryResponse response = new AccountHistoryResponse();
@@ -72,9 +72,9 @@ public class BankEndpoint {
                                                      @SoapHeader("{http://bsr.com/types/bank}AuthHeader") SoapHeaderElement auth)
             throws InvalidSourceAccountException, InvalidAmountException,
             InvalidTitleException, InvalidDestinationAccountException, AccountDoesNotExistsException, JAXBException, AuthenticationFailedException {
-        authenticate(auth);
+        User user = authenticate(auth);
 
-        validator.validate(payload);
+        validator.validate(payload, user);
         accountOperationService.internalTransfer(payload);
 
         OperationSuccessResponse response = factory.createOperationSuccessResponse();
@@ -88,10 +88,10 @@ public class BankEndpoint {
     @ResponsePayload
     public OperationSuccessResponse payment(@RequestPayload PaymentRequest payload,
                                             @SoapHeader("{http://bsr.com/types/bank}AuthHeader") SoapHeaderElement auth)
-            throws InvalidAmountException, InvalidDestinationAccountException, AccountDoesNotExistsException, JAXBException, AuthenticationFailedException {
-        authenticate(auth);
+            throws InvalidAmountException, InvalidDestinationAccountException, AccountDoesNotExistsException, JAXBException, AuthenticationFailedException, InvalidSourceAccountException {
+        User user = authenticate(auth);
 
-        validator.validate(payload);
+        validator.validate(payload, user);
         accountOperationService.remittance(payload);
 
         OperationSuccessResponse response = factory.createOperationSuccessResponse();
@@ -105,10 +105,10 @@ public class BankEndpoint {
     @ResponsePayload
     public OperationSuccessResponse withdrawal(@RequestPayload WithdrawalRequest payload,
                                                @SoapHeader("{http://bsr.com/types/bank}AuthHeader") SoapHeaderElement auth)
-            throws InvalidAmountException, InvalidDestinationAccountException, AccountDoesNotExistsException, JAXBException, AuthenticationFailedException {
-        authenticate(auth);
+            throws InvalidAmountException, InvalidDestinationAccountException, AccountDoesNotExistsException, JAXBException, AuthenticationFailedException, InvalidSourceAccountException {
+        User user = authenticate(auth);
 
-        validator.validate(payload);
+        validator.validate(payload, user);
         accountOperationService.withdrawal(payload);
 
         OperationSuccessResponse response = factory.createOperationSuccessResponse();
@@ -130,10 +130,10 @@ public class BankEndpoint {
             InvalidSourceAccountException,
             InvalidAmountException,
             InvalidTitleException,
-            InvalidDestinationAccountException, AccountDoesNotExistsException, JAXBException {
-        authenticate(auth);
+            InvalidDestinationAccountException, AccountDoesNotExistsException {
+        User user = authenticate(auth);
 
-        validator.validate(payload);
+        validator.validate(payload, user);
         accountOperationService.externalTransfer(payload);
 
         OperationSuccessResponse response = factory.createOperationSuccessResponse();
@@ -143,10 +143,15 @@ public class BankEndpoint {
         return response;
     }
 
-    private User authenticate(SoapHeaderElement auth) throws JAXBException, AuthenticationFailedException {
-        JAXBContext context = JAXBContext.newInstance(AuthHeader.class);
-        Unmarshaller unmarshaller = context.createUnmarshaller();
-        AuthHeader authentication = (AuthHeader) unmarshaller.unmarshal(auth.getSource());
+    private User authenticate(SoapHeaderElement auth) throws AuthenticationFailedException {
+        AuthHeader authentication;
+        try {
+            JAXBContext context = JAXBContext.newInstance(AuthHeader.class);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            authentication = (AuthHeader) unmarshaller.unmarshal(auth.getSource());
+        } catch (Exception e) {
+            throw new AuthenticationFailedException();
+        }
         return validator.checkAuthenticated(authentication);
     }
 

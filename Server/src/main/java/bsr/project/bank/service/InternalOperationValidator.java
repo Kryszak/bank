@@ -19,42 +19,47 @@ public class InternalOperationValidator extends AbstractRequestsValidator {
     }
 
     @LogMethodCall
-    public void validate(AccountHistoryRequest request) throws InvalidSourceAccountException, AccountDoesNotExistsException {
+    public void validate(AccountHistoryRequest request, User user) throws InvalidSourceAccountException, AccountDoesNotExistsException {
         validateSourceAccount(request.getAccount());
+        validateUserAccount(request.getAccount(), user);
     }
 
     @LogMethodCall
-    public void validate(InternalTransferRequest request)
+    public void validate(InternalTransferRequest request, User user)
             throws InvalidAmountException,
             InvalidSourceAccountException,
             InvalidTitleException,
             InvalidDestinationAccountException, AccountDoesNotExistsException {
-        validateAmount(request.getAmount());
+        validateAmount(request.getAmount(), request.getSourceAccount());
         validateSourceAccount(request.getSourceAccount());
+        validateUserAccount(request.getSourceAccount(), user);
         validateTitle(request.getTitle());
         validateDestinationAccount(request.getDestinationAccount());
     }
 
     @LogMethodCall
-    public void validate(PaymentRequest request) throws InvalidDestinationAccountException,
-            InvalidAmountException, AccountDoesNotExistsException {
-        validateAmount(request.getAmount());
+    public void validate(PaymentRequest request, User user) throws InvalidDestinationAccountException,
+            InvalidAmountException, AccountDoesNotExistsException, InvalidSourceAccountException {
+        validateAmount(request.getAmount(), request.getDestinationAccount());
         validateDestinationAccount(request.getDestinationAccount());
+        validateUserAccount(request.getDestinationAccount(), user);
     }
 
     @LogMethodCall
-    public void validate(WithdrawalRequest request) throws InvalidDestinationAccountException,
-            InvalidAmountException, AccountDoesNotExistsException {
-        validateAmount(request.getAmount());
+    public void validate(WithdrawalRequest request, User user) throws InvalidDestinationAccountException,
+            InvalidAmountException, AccountDoesNotExistsException, InvalidSourceAccountException {
+        validateAmount(request.getAmount(), request.getDestinationAccount());
         validateDestinationAccount(request.getDestinationAccount());
+        validateUserAccount(request.getDestinationAccount(), user);
     }
 
     @LogMethodCall
-    public void validate(ExternalTransferRequest request) throws
+    public void validate(ExternalTransferRequest request, User user) throws
             InvalidAmountException, InvalidSourceAccountException,
             InvalidTitleException, InvalidDestinationAccountException, AccountDoesNotExistsException {
-        validateAmount(request.getAmount());
+        validateAmount(request.getAmount(), request.getSourceAccount());
         validateSourceAccount(request.getSourceAccount());
+        validateUserAccount(request.getSourceAccount(), user);
         validateTitle(request.getTitle());
         validateDestinationAccount(request.getDestinationAccount());
     }

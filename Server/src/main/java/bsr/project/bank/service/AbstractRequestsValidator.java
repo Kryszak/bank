@@ -1,7 +1,7 @@
 package bsr.project.bank.service;
 
+import bsr.project.bank.model.User;
 import bsr.project.bank.service.validation.*;
-import bsr.project.bank.service.validation.AccountDoesNotExistsException;
 import org.iban4j.IbanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -22,6 +22,13 @@ public abstract class AbstractRequestsValidator {
             IbanUtil.validate("PL" + sourceAccount);
         } catch (Exception e) {
             throw new InvalidSourceAccountException("Błędny numer rachunku.");
+        }
+    }
+
+    protected void validateUserAccount(String account, User user) throws InvalidSourceAccountException {
+        User accountUser = accountsService.getAccount(account).getUser();
+        if (!accountUser.equals(user)) {
+            throw new InvalidSourceAccountException("Konto nie należy do tego użytkownika");
         }
     }
 
@@ -58,6 +65,13 @@ public abstract class AbstractRequestsValidator {
         }
         if (title.length() > 255) {
             throw new InvalidTitleException("podany tytuł jest dłuższy niż 255 znaków.");
+        }
+    }
+
+    protected void validateAmount(Integer amount, String account) throws InvalidAmountException {
+        validateAmount(amount);
+        if (accountsService.getAccount(account).getBalance() < amount) {
+            throw new InvalidAmountException();
         }
     }
 
