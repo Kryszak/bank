@@ -1,5 +1,10 @@
 package client;
 
+import com.bsr.services.bank.BankPortType;
+import com.bsr.services.bank.BankService;
+import com.bsr.types.bank.AccountsElement;
+import com.bsr.types.bank.LoginRequest;
+import com.bsr.types.bank.LoginResponse;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -7,6 +12,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+
+import javax.xml.ws.soap.SOAPFaultException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
@@ -98,9 +107,9 @@ public class MainViewController {
 
     // account list
     @FXML
-    private ListView<String> accountList;
+    private TextArea accountsTextArea;
 
-    private ObservableList<String> userAccounts = FXCollections.observableArrayList();
+    private BankPortType port;
 
     @FXML
     private void initialize() {
@@ -111,6 +120,10 @@ public class MainViewController {
         historyButton.setOnMouseClicked(getHistoryEventEventHandler());
         internalTransferButton.setOnMouseClicked(getInternalTransferEventEventHandler());
         externalTransferButton.setOnMouseClicked(getExternalTransferEventEventHandler());
+
+        BankService bankService = new BankService();
+        bankService.setHandlerResolver(new SoapHeaderHandler());
+        port = bankService.getBankPort();
     }
 
     private EventHandler<MouseEvent> getLogoutEventEventHandler() {
@@ -198,15 +211,23 @@ public class MainViewController {
             if (validString(username) && validString(password)) {
                 userText.setText("");
                 passwordText.setText("");
-                // TODO request logowania
-                loginForm.visibleProperty().setValue(false);
-                bankForm.visibleProperty().setValue(true);
                 CredentialsHolder.username = username;
                 CredentialsHolder.password = password;
 
-                // TODO wypełnić konta usera
-                userAccounts.add("test");
-                accountList.setItems(userAccounts);
+                LoginResponse response;
+
+                try {
+                    response = port.login(new LoginRequest());
+                } catch (SOAPFaultException ex) {
+                    showPopup(ex.getFault().getFaultString(), Alert.AlertType.ERROR);
+                    return;
+                }
+
+                loginForm.visibleProperty().setValue(false);
+                bankForm.visibleProperty().setValue(true);
+
+                List<String> accounts = response.getAccounts().stream().map(AccountsElement::getAccountNumber).collect(Collectors.toList());
+                accounts.forEach(s -> accountsTextArea.appendText(s + System.lineSeparator()));
             }
         };
     }
