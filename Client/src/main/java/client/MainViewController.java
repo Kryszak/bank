@@ -1,4 +1,4 @@
-package bsr.project.bank;
+package client;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
