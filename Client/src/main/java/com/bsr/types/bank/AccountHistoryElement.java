@@ -125,4 +125,13 @@ public class AccountHistoryElement {
         this.sourceAccountNumber = value;
     }
 
+    @Override
+    public String toString() {
+        return "AccountHistoryElement{" +
+                "title='" + title + '\'' +
+                ", amount=" + amount +
+                ", balance=" + balance +
+                ", sourceAccountNumber='" + sourceAccountNumber + '\'' +
+                '}';
+    }
 }

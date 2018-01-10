@@ -2,11 +2,7 @@ package client;
 
 import com.bsr.services.bank.BankPortType;
 import com.bsr.services.bank.BankService;
-import com.bsr.types.bank.AccountsElement;
-import com.bsr.types.bank.LoginRequest;
-import com.bsr.types.bank.LoginResponse;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import com.bsr.types.bank.*;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -17,7 +13,6 @@ import javax.xml.ws.soap.SOAPFaultException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
 
 public class MainViewController {
@@ -142,12 +137,18 @@ public class MainViewController {
             String title = externalTitle.getText();
             String name = externalName.getText();
             String amount = externalAmount.getText();
-            System.out.println("przelew zewnętrzny " + sourceAccount + " do " + destinationAccount + " " + title + " " + amount + " " + name);
-            // TODO request przelew zewnetrzny
-
-            // TODO popup z wiadomoscia zwrotna
-            showPopup("TODO", INFORMATION);
-            showPopup("TODO", ERROR);
+            try {
+                ExternalTransferRequest request = new ExternalTransferRequest();
+                request.setTitle(title);
+                request.setSourceAccount(sourceAccount);
+                request.setDestinationAccount(destinationAccount);
+                request.setAmount(Integer.parseInt(amount));
+                request.setName(name);
+                OperationSuccessResponse response = port.externalTransfer(request);
+                showPopup(response.getMessage(), INFORMATION);
+            } catch (SOAPFaultException ex) {
+                showPopup(ex.getFault().getFaultString(), Alert.AlertType.ERROR);
+            }
         };
     }
 
@@ -157,24 +158,31 @@ public class MainViewController {
             String destinationAccount = internalDestinationAccount.getText();
             String title = internalTitle.getText();
             String amount = internalAmount.getText();
-            System.out.println("przelew wewnętrzny " + sourceAccount + " do " + destinationAccount + " " + title + " " + amount);
-            // TODO request wewnetrzny przelew
-
-            // TODO popup z wiadomoscia zwrotna
-            showPopup("TODO", INFORMATION);
-            showPopup("TODO", ERROR);
+            try {
+                InternalTransferRequest request = new InternalTransferRequest();
+                request.setTitle(title);
+                request.setSourceAccount(sourceAccount);
+                request.setDestinationAccount(destinationAccount);
+                request.setAmount(Integer.parseInt(amount));
+                OperationSuccessResponse response = port.internalTransfer(request);
+                showPopup(response.getMessage(), INFORMATION);
+            } catch (SOAPFaultException ex) {
+                showPopup(ex.getFault().getFaultString(), Alert.AlertType.ERROR);
+            }
         };
     }
 
     private EventHandler<MouseEvent> getHistoryEventEventHandler() {
         return event -> {
             String account = historyAccount.getText();
-            System.out.println("historia " + account);
-            // TODO request historia
-
-            // TODO popup z wiadomoscia zwrotna
-            showPopup("TODO", INFORMATION);
-            showPopup("TODO", ERROR);
+            try {
+                AccountHistoryRequest request = new AccountHistoryRequest();
+                request.setAccount(account);
+                AccountHistoryResponse response = port.accountHistory(request);
+                showPopup(response.getAccountHistory().toString(), INFORMATION);
+            } catch (SOAPFaultException ex) {
+                showPopup(ex.getFault().getFaultString(), Alert.AlertType.ERROR);
+            }
         };
     }
 
@@ -182,12 +190,15 @@ public class MainViewController {
         return event -> {
             String account = withdrawAccount.getText();
             String amount = withdrawAmount.getText();
-            System.out.println("wypłata " + account + " " + amount);
-            // TODO request wypłata
-
-            // TODO popup z wiadomoscia zwrotna
-            showPopup("TODO", INFORMATION);
-            showPopup("TODO", ERROR);
+            try {
+                WithdrawalRequest request = new WithdrawalRequest();
+                request.setDestinationAccount(account);
+                request.setAmount(Integer.parseInt(amount));
+                OperationSuccessResponse response = port.withdrawal(request);
+                showPopup(response.getMessage(), INFORMATION);
+            } catch (SOAPFaultException ex) {
+                showPopup(ex.getFault().getFaultString(), Alert.AlertType.ERROR);
+            }
         };
     }
 
@@ -195,12 +206,15 @@ public class MainViewController {
         return event -> {
             String account = paymentAccount.getText();
             String amount = paymentAmount.getText();
-            System.out.println("wpłata " + account + " " + amount);
-            // TODO request wpłata
-
-            // TODO popup z wiadomoscia zwrotna
-            showPopup("TODO", INFORMATION);
-            showPopup("TODO", ERROR);
+            try {
+                PaymentRequest request = new PaymentRequest();
+                request.setDestinationAccount(account);
+                request.setAmount(Integer.parseInt(amount));
+                OperationSuccessResponse response = port.payment(request);
+                showPopup(response.getMessage(), INFORMATION);
+            } catch (SOAPFaultException ex) {
+                showPopup(ex.getFault().getFaultString(), Alert.AlertType.ERROR);
+            }
         };
     }
 

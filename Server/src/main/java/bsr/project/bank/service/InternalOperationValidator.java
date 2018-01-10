@@ -30,17 +30,13 @@ public class InternalOperationValidator extends AbstractRequestsValidator {
             InvalidSourceAccountException,
             InvalidTitleException,
             InvalidDestinationAccountException, AccountDoesNotExistsException {
-        validateAmount(request.getAmount(), request.getSourceAccount());
-        validateSourceAccount(request.getSourceAccount());
-        validateUserAccount(request.getSourceAccount(), user);
-        validateTitle(request.getTitle());
-        validateDestinationAccount(request.getDestinationAccount());
+        validateTransfer(user, request.getAmount(), request.getSourceAccount(), request.getTitle(), request.getDestinationAccount());
     }
 
     @LogMethodCall
     public void validate(PaymentRequest request, User user) throws InvalidDestinationAccountException,
             InvalidAmountException, AccountDoesNotExistsException, InvalidSourceAccountException {
-        validateAmount(request.getAmount(), request.getDestinationAccount());
+        validateAmount(request.getAmount());
         validateDestinationAccount(request.getDestinationAccount());
         validateUserAccount(request.getDestinationAccount(), user);
     }
@@ -57,10 +53,14 @@ public class InternalOperationValidator extends AbstractRequestsValidator {
     public void validate(ExternalTransferRequest request, User user) throws
             InvalidAmountException, InvalidSourceAccountException,
             InvalidTitleException, InvalidDestinationAccountException, AccountDoesNotExistsException {
-        validateAmount(request.getAmount(), request.getSourceAccount());
-        validateSourceAccount(request.getSourceAccount());
-        validateUserAccount(request.getSourceAccount(), user);
-        validateTitle(request.getTitle());
-        validateDestinationAccount(request.getDestinationAccount());
+        validateTransfer(user, request.getAmount(), request.getSourceAccount(), request.getTitle(), request.getDestinationAccount());
+    }
+
+    private void validateTransfer(User user, int amount, String sourceAccount, String title, String destinationAccount) throws InvalidAmountException, InvalidSourceAccountException, AccountDoesNotExistsException, InvalidTitleException, InvalidDestinationAccountException {
+        validateAmount(amount, sourceAccount);
+        validateSourceAccount(sourceAccount);
+        validateUserAccount(sourceAccount, user);
+        validateTitle(title);
+        validateDestinationAccount(destinationAccount);
     }
 }
