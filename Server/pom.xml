@@ -43,6 +43,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web-services</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.h2database</groupId>
@@ -72,16 +76,6 @@
             <groupId>org.iban4j</groupId>
             <artifactId>iban4j</artifactId>
             <version>3.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjrt</artifactId>
-            <version>1.8.10</version>
-        </dependency>
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
-            <version>1.8.10</version>
         </dependency>
         <dependency>
             <groupId>org.jvnet.jaxb2_commons</groupId>
@@ -135,17 +129,6 @@
                         </plugin>
                     </plugins>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.jcabi</groupId>
-                <artifactId>jcabi-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>ajc</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
